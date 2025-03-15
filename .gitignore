@@ -5,4 +5,4 @@ model_based_rl/stage_3_action_heat/Models/*
 model_free_rl/stage_1_action_heat/Models/*
 model_free_rl/stage_2_actions_heat_fan_cool/Models/*
 
-model_based_rl/stage_1_action_heat/Models/readme.txt
+model_based_rl/stage_1_action_heat/Models/readme_models.txt
