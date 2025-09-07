@@ -161,11 +161,11 @@ for i_episode in range(last_loaded_episode + 1, n_training_episodes+1):
         train_time = train_time + ( time.time() - start_time)                
         
             
-        save_train_results(i_episode, metrics_path, env , exp_path, env_attributes["points"], train_time, episode_rewards, plot_scores_train_extrinsic, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, env_type)
+        #save_train_results(i_episode, metrics_path, env , exp_path, env_attributes["points"], train_time, episode_rewards, plot_scores_train_extrinsic, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, env_type)
         
-        save_test_results(i_episode, metrics_path, env, env_attributes["state_mask"], exp_path, env_attributes["points"], actor, env_type) 
+        #save_test_results(i_episode, metrics_path, env, env_attributes["state_mask"], exp_path, env_attributes["points"], actor, env_type) 
         
-        save_models(i_episode, exp_path, actor,actor_optimizer,critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory, env_type)    
+        #save_models(i_episode, exp_path, actor,actor_optimizer,critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory, env_type)    
         
 
 
