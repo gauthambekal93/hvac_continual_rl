@@ -36,9 +36,9 @@ import json
  
 
 
-with open('all_paths.json', 'r') as openfile:           json_data = json.load(openfile)
+#with open('all_paths.json', 'r') as openfile:           json_data = json.load(openfile)
 
-exp_path = json_data['experiment_path']
+#exp_path = json_data['experiment_path']
 
 
 def test_agent(env, env_attributes, data_params, model_params, actor, start_time ):

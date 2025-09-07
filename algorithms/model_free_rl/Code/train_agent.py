@@ -19,11 +19,7 @@ from agent_model import Actor, Critic
 
 from memory_module import Agent_Memory
 
-#from save_results import save_models, save_train_results, save_test_results
-
-#import time
 import warnings
-#import csv
 import copy
 import re
 import pickle
@@ -32,25 +28,13 @@ import pickle
 warnings.filterwarnings("ignore", category=UserWarning, message="WARN: env.step_period to get variables from other wrappers is deprecated*")
 warnings.filterwarnings("ignore", category=UserWarning, message="WARN: env.get_kpis to get variables from other wrappers is deprecated*")
 
-
-#env   = bestest_hydronic()
-
-#n_training_episodes = int( env_attributes['n_training_episodes'] )
-
-#max_t = int(env_attributes['max_t'])
-
-#gamma = float(env_attributes['gamma'])
-
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-#print("Device ", device)
+#with open('all_paths.json', 'r') as openfile:  json_data = json.load(openfile)
 
-
-with open('all_paths.json', 'r') as openfile:  json_data = json.load(openfile)
-
-exp_path = json_data['experiment_path']
-metrics_path = json_data['metrics_path']
-rl_data_path = json_data['rl_data_path']
+#exp_path = json_data['experiment_path']
+#metrics_path = json_data['metrics_path']
+#rl_data_path = json_data['rl_data_path']
 
 
 
@@ -100,6 +84,8 @@ def initialize_agent(env_attributes):
 
 def load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, env_attributes):     
      
+     exp_path = None  # THIS PATH WILL COME FROM main_code and needs to be updated !!!
+    
      model_files = [f for f in os.listdir(exp_path + '/Models/' ) if f.startswith('actor_model_') and f.endswith('.pkl')]
      
      if len(model_files) > 0: 
