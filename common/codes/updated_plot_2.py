@@ -41,19 +41,19 @@ import json
 #exp_path = json_data['experiment_path']
 
 
-def test_agent(env, env_attributes, data_params, model_params, actor, start_time ):
+def test_agent(env, real_env_attributes, agent_attributes, actor, start_time ):
     ''' Test model agent in env.'''   
     
-    episode_length = data_params["time_params"]["episode_length_test"]
-    warmup_period = data_params["time_params"]["warmup_period_test"] 
-    state_mask = state_mask = env_attributes["state_mask"]
-    plot = True if model_params["plot"] else False  
-    points =  data_params["points"] 
-    save_to_file = True if model_params["save_to_file"] else False  
+    episode_length = real_env_attributes["episode_length_test"]
+    warmup_period = real_env_attributes["warmup_period_test"] 
+    state_mask = agent_attributes["state_mask"]
+    plot = agent_attributes["plot"] 
+    points =  real_env_attributes["points"] 
+    save_to_file =  agent_attributes["save_to_file"]
     log_dir=os.getcwd()
-    testcase = env_attributes["type"]
-    random_start_time = data_params["time_params"]["random_start_time"]
-    start_time_train =  data_params["time_params"]["start_time_train"]
+    testcase = real_env_attributes["type"]
+    random_start_time = real_env_attributes["random_start_time"]
+    start_time_train =  real_env_attributes["start_time_train"]
     
     # Set a fixed start time
     if isinstance(env,Wrapper): 

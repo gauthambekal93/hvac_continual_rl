@@ -151,6 +151,10 @@ def bestest_hydronic_heat_pump(data_params, model_params):
                          "type": data_params["env_type"],
                          "max_episode_length": max_episode_length,
                          "start_time_tests": start_time_tests,
+                         "warmup_period" : warmup_period ,
+                         "episode_length_test" : episode_length_test,
+                         "random_start_time" : random_start_time,
+                         "start_time_train": start_time_train, 
                          "device": torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
                         } 
     
@@ -174,7 +178,11 @@ def bestest_hydronic_heat_pump(data_params, model_params):
                         "metrics_path": model_params["rl_agent"]["metrics_path"],
                         "exp_path":  model_params["rl_agent"]["exp_path"],
                         "model_path":  model_params["rl_agent"]["model_path"],
-                        "save_to_file": True if model_params["rl_agent"]["save_to_file"]=="True" else False
+                        "individual_train_results": model_params["rl_agent"]["individual_train_results"],
+                        "individual_test_results":  model_params["rl_agent"]["individual_test_results"],
+                        "consolidated_results":  model_params["rl_agent"]["consolidated_results"],
+                        "save_to_file": True if model_params["rl_agent"]["save_to_file"]=="True" else False,
+                        "plot": True if model_params["rl_agent"]["plot"]=="True" else False,
 
         }
     
