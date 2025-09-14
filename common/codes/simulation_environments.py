@@ -167,27 +167,26 @@ def bestest_hydronic_heat_pump(data_params, model_params):
                            "type": data_params["env_type"]
                         } 
     
-    if model_params["algorithm_type"]=="vanilla_sac":
+    if model_params["algorithm_type"]=="model_free_sac":
         return env,  env_attributes
     
     env_model_attributes = {
-                        "num_tasks": 3,
-                        "num_layers":3,
-                        "real_zone_input": ( obs_dim - 3 ) + 3, #-3 is because we donot use time, "reaTSetHea_y","reaTSetCoo_y" to predict next state, +3 is for actions
-                        "dry_bulb_input": ( obs_dim - 4 ), #-4 is because we donot use time, "reaTZon_y", "reaTSetHea_y","reaTSetCoo_y" to predict next state
-                        "reward_model_input": 6, # 3 beacuse we use  "reaTZon_y", "reaTSetHea_y","reaTSetCoo_y" and another 3 for actions 
-                        "hidden_layers": 32,
-                         "lr": 0.0001,  
-                         "real_zone_output": 1,
-                         "dry_bulb_output": 1 , 
-                         "reward_model_output": 1,
-                         "task_index": 0,
-                         "epochs": 301, #was 501
-                         "hypernet_old":None,
-                         "buffer_size": 4035, #was 4000, 5000, 1400 is about 1 episode, to keep 4035 (slightly above 1344*3 )
-                         "batch_size": 20, #was 20,
-                         "train_test_ratio":0.80,
-
+                        "num_tasks": model_params["num_tasks"],
+                        "real_zone_input": model_params["real_zone_input"], #-3 is because we donot use "time", "reaTSetHea_y","reaTSetCoo_y" to predict next state, +3 is for actions
+                        "dry_bulb_input": model_params["dry_bulb_input"], #-4 is because we donot use "time", "reaTZon_y", "reaTSetHea_y","reaTSetCoo_y" to predict next state
+                        "reward_model_input": model_params["reward_model_input"], # 3 beacuse we use  "reaTZon_y", "reaTSetHea_y","reaTSetCoo_y" and another 3 for actions 
+                         "agent_lr": model_params["env_model_agent_lr"],  
+                         "real_zone_output": model_params["real_zone_output"],
+                         "dry_bulb_output": model_params["dry_bulb_output"] , 
+                         "reward_model_output": model_params["reward_model_output"],
+                         "task_index": model_params["task_index"],
+                         "epochs": model_params["epochs"],
+                         "hypernet_old": None,
+                         "synthetic_buffer_size": model_params["synthetic_buffer_size"], #was 4000, 5000, 1400 is about 1 episode, to keep 4035 (slightly above 1344*3 )
+                         "env_model_batch_size": model_params["env_model_batch_size"],
+                         "train_test_ratio":model_params["train_test_ratio"],
+                         "env_model_hidden_layers":model_params["env_model_hidden_layers"],
+                         "env_model_num_layers": model_params["env_model_num_layers"], 
                        }
     
     return  env,  env_attributes , env_model_attributes
@@ -201,5 +200,3 @@ if __name__ == "__main__":
     
 
     
-
-

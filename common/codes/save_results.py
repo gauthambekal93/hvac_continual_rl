@@ -27,8 +27,6 @@ test_jan17_time, test_apr19_time, test_nov15_time, test_dec08_time = 0, 0, 0, 0
 
 
 
-
-
 def save_models(i_episode, model_params, actor, actor_optimizer,critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory):
     
     exp_path = model_params["exp_path"]
