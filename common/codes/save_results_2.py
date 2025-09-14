@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 import pickle 
 
-from updated_plot import test_agent, get_plots
+from updated_plot_2 import test_agent, get_plots
 #from simulation_environments import max_episode_length, start_time_tests,episode_length_test, warmup_period_test
 
 
@@ -53,17 +53,18 @@ def save_models(i_episode, agent_attributes, actor, actor_optimizer, critic_1, c
       
      
 
-def plot_and_save_specific(plt, day_of_year, exp_path, i_episode, save_to_file, data_type ):
+def plot_and_save_specific(plt, day_of_year, specific_result_path, i_episode, save_to_file, data_type ):
+    
     plt.tight_layout()
     
     if save_to_file:
-        plt.savefig(exp_path + '/'+ data_type+'/'  + 'train_episode_' + str(i_episode) +'_'+str(int(day_of_year))+ '.png',  bbox_inches='tight')
-    
+        #plt.savefig(exp_path + '/'+ data_type+'/'  + 'train_episode_' + str(i_episode) +'_'+str(int(day_of_year))+ '.png',  bbox_inches='tight')
+        plt.savefig(specific_result_path  + data_type +'_'+ str(i_episode) +'_'+str(int(day_of_year))+ '.png',  bbox_inches='tight')
     plt.show()
     
 
 
-def plot_and_save_overall(plt, env, env_type, exp_path, metrics_path, i_episode, plot_scores, max_episode_length, day_of_year, episode_actor_loss , episode_critic_1_loss, episode_critic_2_loss , q_predictions, time_taken, train_date, type_of_data):
+def plot_and_save_overall(plt, env, env_type, consolidated_result_path, metrics_path, i_episode, plot_scores, max_episode_length, day_of_year, episode_actor_loss , episode_critic_1_loss, episode_critic_2_loss , q_predictions, time_taken, train_date, type_of_data):
     
     with open(metrics_path, 'a', newline='') as file:
             
@@ -78,7 +79,6 @@ def plot_and_save_overall(plt, env, env_type, exp_path, metrics_path, i_episode,
              
                  print("KPIs \n ",  env.get_kpis() )
              
-             #train_date = datetime.datetime(year, 1, 1) + datetime.timedelta(days=int(day_of_year) - 1)
     
              kpis = env.get_kpis()
              
@@ -95,7 +95,7 @@ def plot_and_save_overall(plt, env, env_type, exp_path, metrics_path, i_episode,
              plt.ylabel(type_of_data+ ' rewards')
              plt.plot( list(plot_scores.keys()), list(plot_scores.values()) )
              plt.tight_layout()
-             plt.savefig(exp_path+ '/'+type_of_data +'_'+ env_type + '.png')
+             plt.savefig(consolidated_result_path+ '/'+type_of_data +'_'+ env_type + '.png')
              plt.close() 
 
         file.close()
@@ -104,7 +104,8 @@ def plot_and_save_overall(plt, env, env_type, exp_path, metrics_path, i_episode,
 def save_train_results(i_episode, train_time, episode_rewards, plot_scores_train, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, real_env_attributes, agent_attributes , env ):    
     
     metrics_path = agent_attributes["metrics_path"]
-    exp_path = agent_attributes["exp_path"]
+    specific_result_path = agent_attributes["individual_train_results"]
+    consolidated_result_path = agent_attributes["consolidated_results"]
     points = real_env_attributes["points"]
     max_episode_length = real_env_attributes["max_episode_length"]
     env_type = real_env_attributes["type"]
@@ -115,9 +116,9 @@ def save_train_results(i_episode, train_time, episode_rewards, plot_scores_train
     
     train_date = datetime.datetime(year, 1, 1) + datetime.timedelta(days=int(day_of_year) - 1)
     
-    plot_and_save_specific(plt, day_of_year, exp_path, i_episode, save_to_file, data_type = "Train")
+    plot_and_save_specific(plt, day_of_year, specific_result_path, i_episode, save_to_file, data_type = "Train")
     
-    plot_and_save_overall(plt, env, env_type, exp_path, metrics_path, i_episode, plot_scores_train, max_episode_length, day_of_year, episode_actor_loss , episode_critic_1_loss, episode_critic_2_loss , q_predictions, train_time, train_date, 'train')
+    plot_and_save_overall(plt, env, env_type, consolidated_result_path, metrics_path, i_episode, plot_scores_train, max_episode_length, day_of_year, episode_actor_loss , episode_critic_1_loss, episode_critic_2_loss , q_predictions, train_time, train_date, 'train')
     
   
     
@@ -156,7 +157,7 @@ def save_test_results(i_episode, env, real_env_attributes, agent_attributes , ac
     
     start = time.time()
     
-    observations, actions, rewards_test, kpis, plt, day_of_year, results = test_agent(env, env_attributes, data_params, model_params, actor, start_time_tests[0] )
+    observations, actions, rewards_test, kpis, plt, day_of_year, results = test_agent(env, real_env_attributes, agent_attributes, actor, start_time_tests[0] )
     
     test_date = datetime.datetime(year, 1, 1) + datetime.timedelta(days=int(day_of_year) - 1)
     
@@ -183,7 +184,7 @@ def save_test_results(i_episode, env, real_env_attributes, agent_attributes , ac
         
     start = time.time()
     
-    observations, actions, rewards_test, kpis, plt, day_of_year, results = test_agent(env, env_attributes, data_params, model_params, actor , start_time_tests[1] )
+    observations, actions, rewards_test, kpis, plt, day_of_year, results = test_agent(env, real_env_attributes, agent_attributes, actor , start_time_tests[1] )
     
     test_date = datetime.datetime(year, 1, 1) + datetime.timedelta(days=int(day_of_year) - 1)
     
