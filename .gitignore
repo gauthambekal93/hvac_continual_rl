@@ -12,9 +12,10 @@ model_free_rl/stage_2_actions_heat_fan_cool/Models/*
 
 !model_free_rl/stage_1_action_heat/Models/README.txt
 !model_free_rl/stage_2_actions_heat_fan_cool/Models/README.txt
-!results/boptest_hydronic_heat_pump/model_free_sac/0/Train
+!results/boptest_hydronic_heat_pump/model_free_sac/0/train_inidividual
+!results/boptest_hydronic_heat_pump/model_free_sac/0/test_inidividual
+
 !results/boptest_hydronic_heat_pump/model_free_sac/0/Test
 
 results/boptest_hydronic_heat_pump/model_based_sac/0/test_individual
-
 results/boptest_hydronic_heat_pump/model_based_sac/0/train_individual
