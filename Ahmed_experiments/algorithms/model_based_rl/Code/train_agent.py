@@ -1,0 +1,303 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Nov 20 18:38:10 2024
+
+@author: gauthambekal93
+"""
+
+import os
+
+import numpy as np
+import torch
+#import random
+
+
+ 
+import torch.optim as optim
+import torch.nn as nn
+
+#import json
+
+
+from agent_model import Actor, Critic
+
+from memory_module import Agent_Memory, Synthetic_Memory
+
+import warnings
+
+import copy
+import re
+import pickle
+
+# Filter out the specific UserWarning
+warnings.filterwarnings("ignore", category=UserWarning, message="WARN: env.step_period to get variables from other wrappers is deprecated*")
+warnings.filterwarnings("ignore", category=UserWarning, message="WARN: env.get_kpis to get variables from other wrappers is deprecated*")
+
+
+
+#device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+
+
+#with open('all_paths.json', 'r') as openfile:  json_data = json.load(openfile)
+
+#exp_path = json_data['experiment_path']
+#metrics_path = json_data['metrics_path']
+#rl_data_path = json_data['rl_data_path']
+
+
+
+#rho = 0.99
+#alpha = 0.15
+
+mse_loss = nn.MSELoss()
+
+
+def initialize_agent(real_env_attributes, agent_attributes):     
+     
+     device = real_env_attributes["device"]
+     state_space = real_env_attributes["state_space"]
+     action_bins = real_env_attributes["action_bins"]
+     
+     hidden_size = agent_attributes["hidden_size"]
+     no_of_action_types =  agent_attributes["no_of_action_types"]
+     actor_lr = agent_attributes["actor_lr"]
+     critic_lr = agent_attributes["critic_lr"]
+     real_buffer_size = agent_attributes["real_buffer_size"]
+     synthetic_buffer_size = agent_attributes["synthetic_buffer_size"]
+     
+     
+     actor = Actor(state_space,  hidden_size,  action_bins, device, no_of_action_types  ).to(device) 
+    
+     actor_optimizer = optim.Adam( actor.parameters(), lr= actor_lr )
+     
+     
+     critic_1 = Critic(state_space,  hidden_size, device, no_of_action_types ).to(device) 
+     
+     critic_optimizer_1 = optim.Adam( critic_1.parameters(), lr =  critic_lr )
+     
+     
+     critic_2 = Critic(state_space, hidden_size, device, no_of_action_types ).to(device) 
+     
+     critic_optimizer_2 = optim.Adam( critic_2.parameters(), lr =  critic_lr )
+     
+     #the entire architecture and weights of model is copied and anychanges to critic_1 weights would not affect critic_target_1
+     critic_target_1 = copy.deepcopy(critic_1)
+     
+     #this is to ensure that we are not by chance updating the weights of target network
+     for param in critic_target_1.parameters():
+         param.requires_grad = False
+         
+     critic_target_2 = copy.deepcopy(critic_2)
+     
+     for param in critic_target_2.parameters():
+        param.requires_grad = False
+     
+     agent_actual_memory = Agent_Memory(real_buffer_size)
+     
+     agent_synthetic_memory = Synthetic_Memory(synthetic_buffer_size)
+     
+     return actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, agent_synthetic_memory
+
+    
+
+def load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, agent_synthetic_memory,env_attributes):     
+     
+     exp_path = None  # THIS PATH WILL COME FROM main_code and needs to be updated !!!
+    
+     model_files = [f for f in os.listdir(exp_path + '/Models/' ) if f.startswith('actor_model_') and f.endswith('.pkl')]
+     
+     if len(model_files) > 0: 
+         
+         last_loaded_epoch = max( [int(re.search(r'actor_model_(\d+)', f).group(1)) for f in model_files] )
+         
+         checkpoint = torch.load(exp_path + '/Models/'+'actor_model_'+str(last_loaded_epoch )+'_.pkl')
+        
+         actor.load_state_dict(checkpoint['model_state_dict'])
+         
+         actor_optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    
+    
+         checkpoint = torch.load(exp_path + '/Models/'+'critic_model_1_'+str(last_loaded_epoch)+'_.pkl')
+         
+         critic_1.load_state_dict(checkpoint['model_state_dict'])
+         
+         critic_optimizer_1.load_state_dict(checkpoint['optimizer_state_dict'])
+         
+         
+         checkpoint = torch.load(exp_path + '/Models/'+'critic_model_2_'+str(last_loaded_epoch)+'_.pkl')
+         
+         critic_2.load_state_dict(checkpoint['model_state_dict'])
+         
+         critic_optimizer_2.load_state_dict(checkpoint['optimizer_state_dict'])
+         
+         
+         #the entire architecture and weights of model is copied and anychanges to critic_1 weights would not affect critic_target_1
+         critic_target_1 = copy.deepcopy(critic_1)
+         
+         #this is to ensure that we are not by chance updating the weights of target network
+         for param in critic_target_1.parameters():
+             param.requires_grad = False
+             
+         critic_target_2 = copy.deepcopy(critic_2)
+         
+         for param in critic_target_2.parameters():
+            param.requires_grad = False
+     else:
+         last_loaded_epoch = 0
+         
+     if os.path.exists (exp_path + '/Models/'+"agent_actual_data.pkl"):   
+         with open(exp_path + '/Models/'+"agent_actual_data.pkl", "rb") as f:
+            agent_actual_memory = pickle.load(f)
+     
+     if os.path.exists (exp_path + '/Models/'+"agent_synthetic_memory.pkl"):   
+         with open(exp_path + '/Models/'+"agent_synthetic_memory.pkl", "rb") as f:
+            agent_synthetic_memory = pickle.load(f)
+            
+     return actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, agent_synthetic_memory, last_loaded_epoch  
+    
+    
+def update_hyperparameters(actor_optimizer, critic_optimizer_1, critic_optimizer_2, env_attributes):
+    
+    for param_group in actor_optimizer.param_groups:
+        param_group['lr'] = env_attributes["actor_lr"]
+        
+    for param_group in critic_optimizer_1.param_groups:
+        param_group['lr'] = env_attributes["critic_lr"]
+
+    for param_group in critic_optimizer_2.param_groups:
+        param_group['lr'] = env_attributes["critic_lr"]
+        
+
+    
+    
+def collect_from_actual_env( env, action):
+    
+    next_state, reward, done, _, res  = env.step(action )
+    
+    if done:
+        done = 1
+    else:
+        done = 0
+        
+    return next_state, reward, done
+    
+
+
+def compute_target( actor, critic_target_1, critic_target_2,  reward_samples, next_state_samples, done_samples, gamma, alpha ):
+    
+    with torch.no_grad():
+        next_action, _, action_log_probs = actor.select_action(next_state_samples)
+    
+    q_val_target_1 = critic_target_1.get_q_value(next_state_samples, next_action)
+    
+    q_val_target_2 = critic_target_2.get_q_value(next_state_samples, next_action)
+    
+    q_val_next = torch.min( q_val_target_1 , q_val_target_2) 
+    
+    q_val_target = reward_samples +  gamma*( 1 - done_samples )* ( q_val_next  - alpha * action_log_probs   ) 
+    
+    return q_val_target
+
+
+
+def train_critic( critic_1, critic_2, critic_optimizer_1, critic_optimizer_2, state_samples, action_samples , q_val_target ):
+    
+        
+    critic_loss_1 = mse_loss (  critic_1.get_q_value(state_samples, action_samples),  q_val_target )
+    
+    critic_loss_2 = mse_loss (  critic_2.get_q_value(state_samples, action_samples),  q_val_target )
+    
+    
+    critic_optimizer_1.zero_grad()
+    
+    critic_optimizer_2.zero_grad()
+    
+    
+    critic_loss_1.backward()
+    
+    critic_loss_2.backward()
+    
+    # Optional: Gradient clipping for stability
+    torch.nn.utils.clip_grad_norm_(critic_1.parameters(), max_norm=1.0)
+    
+    torch.nn.utils.clip_grad_norm_(critic_2.parameters(), max_norm=1.0)
+   
+    
+    critic_optimizer_1.step()
+    
+    critic_optimizer_2.step()
+    
+    return critic_loss_1.item(), critic_loss_2.item()
+
+
+def train_actor( actor, critic_1, critic_2, actor_optimizer, state_samples, alpha):
+    
+    
+    action, _, action_log_probs = actor.select_action(state_samples)
+    
+    # Freeze critic parameters
+    for param in critic_1.parameters():
+        param.requires_grad = False
+        
+    for param in critic_2.parameters():
+        param.requires_grad = False
+    
+    
+    q_val_1 = critic_1.get_q_value( state_samples, action )  
+    
+    q_val_2 = critic_2.get_q_value( state_samples, action )  
+    
+    q_val = torch.min( q_val_1, q_val_2  )
+    
+    actor_loss = - torch.mean( ( q_val - alpha* (action_log_probs ) ) ) #we need maximize actor_loss 
+    
+    
+    actor_optimizer.zero_grad()
+    
+    actor_loss.backward()
+    
+    actor_optimizer.step()
+    
+    
+    # Unfreeze critic parameters
+    for param in critic_1.parameters():
+       param.requires_grad = True
+    
+    for param in critic_2.parameters():
+       param.requires_grad = True
+     
+    return actor_loss.item()    
+    
+    
+
+def update_target_critic(critic_target_1, critic_target_2, critic_1, critic_2, rho):
+    
+    for target_param, param in zip(critic_target_1.parameters(), critic_1.parameters()):
+        target_param.data.copy_(rho * target_param.data + (1 - rho) * param.data)
+
+
+    for target_param, param in zip(critic_target_2.parameters(), critic_2.parameters()):
+        target_param.data.copy_(rho * target_param.data + (1 - rho) * param.data)
+
+ 
+      
+
+
+
+def get_train_data( agent_actual_memory , agent_synthetic_memory, agent_attributes ):
+    
+    sample_size = agent_attributes["batch_size"]
+    
+    if ( np.random.rand() >= ( 1 / agent_attributes["no_of_updates"] ) ) and (agent_synthetic_memory.memory_size() > 0) :
+        
+        states, actions, rewards, next_states, done, _ = agent_synthetic_memory.sample_memory(  sample_size = sample_size )
+    
+    else:
+    
+        states, actions, _, rewards, next_states, done =  agent_actual_memory.sample_memory(  sample_size = sample_size)
+    
+    return  states[ :, agent_attributes["state_mask"] ], actions [ :,  agent_attributes["action_mask"] ] , rewards, next_states[ :,  agent_attributes["state_mask"] ], done 
+    
+        
+
