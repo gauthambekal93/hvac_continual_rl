@@ -108,7 +108,7 @@ if __name__ == '__main__':
         temp.to_csv(metrics_path, index = False)
         
         filtered_df = temp.loc[temp["Type"] == "Train", ["episode", "extrinsic_reward"]]
-        plot_scores_train_extrinsic = filtered_df.set_index("episode")["extrinsic_reward"].to_dict()
+        plot_scores_train = filtered_df.set_index("episode")["extrinsic_reward"].to_dict()
         
         if len(temp)>0:
            train_time = temp.loc[ temp["Type"] == "Train"]['time_steps'].iloc[-1]
@@ -118,15 +118,12 @@ if __name__ == '__main__':
         
         with open(metrics_path, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Type','episode', 'time_steps', 'Length', 'Date', 'actor_loss', 'critic_1_loss','critic_2_loss','q_predictions','cost_tot', 'emis_tot','ener_tot','idis_tot','pdih_tot','pele_tot','pgas_tot','tdis_tot','extrinsic_reward'])
+            writer.writerow(['Type','episode', 'time_steps', 'Length', 'Date', 'actor_loss', 'critic_1_loss','critic_2_loss','q_predictions','cost_tot', 'emis_tot','ener_tot','idis_tot','pdih_tot','pele_tot','pgas_tot','tdis_tot','reward'])
             file.close()
         
-        plot_scores_train_extrinsic = {}
+        plot_scores_train, train_time = {}, 0
         
-        train_time = 0
-
-    plot_scores_train , train_time = {}, 0
-    
+        
     for i_episode in range(last_loaded_episode + 1, n_training_episodes+1): 
             
             start_time = time.time()
@@ -139,8 +136,8 @@ if __name__ == '__main__':
             
             while done==0:
                 #Time taken: 0.040
-                if time_step % 100 == 0:  
-                    print("Episode: ", i_episode, time_step, "No of memory elements: ",len(agent_actual_memory.states) )
+                #if time_step % 100 == 0:  
+                #    print("Episode: ", i_episode, time_step, "No of memory elements: ",len(agent_actual_memory.states) )
                 
                 action, discrete_action, _ = actor.select_action(state [ agent_attributes["state_mask"] ] )
                 
@@ -152,17 +149,26 @@ if __name__ == '__main__':
                 
                 time_step +=1
                 
-                plot_scores_train_extrinsic[i_episode] = plot_scores_train_extrinsic.get(i_episode, 0) + reward
+                plot_scores_train[i_episode] = plot_scores_train.get(i_episode, 0) + reward
                 
                 episode_rewards.append(reward)
 
+
+                '''
                 if (len(env_memory_train.states_train) >0) and (len(env_memory_train.states_validation) >0):    
                     
-                    train_neuralnet(reward_model, env_memory_train, learnt_env_attributes) 
+                    reward_model_loss, reward_model  = train_neuralnet(reward_model, env_memory_train, learnt_env_attributes) 
                         
-                    train_neuralnet(realT_zon_model, env_memory_train, learnt_env_attributes ) 
+                    zone_temp_loss, realT_zon_model  = train_neuralnet(realT_zon_model, env_memory_train, learnt_env_attributes ) 
                     
                 
+                if time_step % 100 == 0:  
+                    print("Episode: ", i_episode, time_step, "Reward Loss: ",reward_model_loss, "Zone temp Loss: ", zone_temp_loss)
+               
+                '''
+                if time_step % 100 == 0:  
+                    print(time_step)
+                    
                 if env_memory_train.memory_size() > 10:
                 
                     create_synthetic_data( actor, realT_zon_model, dry_bulb_model, reward_model, agent_actual_memory, agent_synthetic_memory, real_env_attributes, agent_attributes, learnt_env_attributes, env )
@@ -198,10 +204,8 @@ if __name__ == '__main__':
             save_train_results(i_episode, train_time, episode_rewards, plot_scores_train, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, real_env_attributes, agent_attributes , env )
             
             save_test_results(i_episode, env, real_env_attributes, agent_attributes , actor)
-            
-            save_models(i_episode, agent_attributes, actor, actor_optimizer, critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory)
-            
     
+            save_models(i_episode, actor, actor_optimizer, critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory, agent_attributes, learnt_env_attributes, realT_zon_model, reward_model)
     
     
     

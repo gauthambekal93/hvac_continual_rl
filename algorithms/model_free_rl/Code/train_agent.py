@@ -34,14 +34,14 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 
-train_start_episode = 2
-rho = 0.99
-alpha = 0.15
-no_of_updates = 1
+#train_start_episode = 2
+#was rho = 0.99
+#was alpha = 0.15
+#no_of_updates = 1
 
 mse_loss = nn.MSELoss()
 
-
+'''
 def initialize_agent(env_attributes):     
      
      
@@ -76,8 +76,57 @@ def initialize_agent(env_attributes):
      
      return actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory
 
-    
+'''    
 
+def initialize_agent(real_env_attributes, agent_attributes):     
+     
+     device = real_env_attributes["device"]
+     state_space = real_env_attributes["state_space"]
+     action_bins = real_env_attributes["action_bins"]
+     
+     hidden_size = agent_attributes["hidden_size"]
+     no_of_action_types =  agent_attributes["no_of_action_types"]
+     actor_lr = agent_attributes["actor_lr"]
+     critic_lr = agent_attributes["critic_lr"]
+     real_buffer_size = agent_attributes["real_buffer_size"]
+     
+     
+     
+     actor = Actor(state_space,  hidden_size,  action_bins, device, no_of_action_types  ).to(device) #was  int(env_attributes["action_space"])
+    
+     actor_optimizer = optim.Adam( actor.parameters(), lr= actor_lr )
+     
+     
+     critic_1 = Critic(state_space,  hidden_size, device, no_of_action_types ).to(device) #was  
+     
+     critic_optimizer_1 = optim.Adam( critic_1.parameters(), lr =  critic_lr )
+     
+     
+     critic_2 = Critic(state_space, hidden_size, device, no_of_action_types ).to(device) #was  int(env_attributes["action_space"])
+     
+     critic_optimizer_2 = optim.Adam( critic_2.parameters(), lr =  critic_lr )
+     
+     #the entire architecture and weights of model is copied and anychanges to critic_1 weights would not affect critic_target_1
+     critic_target_1 = copy.deepcopy(critic_1)
+     
+     #this is to ensure that we are not by chance updating the weights of target network
+     for param in critic_target_1.parameters():
+         param.requires_grad = False
+         
+     critic_target_2 = copy.deepcopy(critic_2)
+     
+     for param in critic_target_2.parameters():
+        param.requires_grad = False
+     
+     agent_actual_memory = Agent_Memory(real_buffer_size )
+     
+     
+     return actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory
+
+
+
+
+     
 def load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, env_attributes):     
      
      exp_path = None  # THIS PATH WILL COME FROM main_code and needs to be updated !!!
@@ -159,7 +208,7 @@ def collect_from_actual_env( env, action):
     
 
 
-def compute_target( actor, critic_target_1, critic_target_2,  reward_samples, next_state_samples, done_samples, gamma ):
+def compute_target( actor, critic_target_1, critic_target_2,  reward_samples, next_state_samples, done_samples, gamma, alpha ):
     
     with torch.no_grad():
         next_action, _, action_log_probs = actor.select_action(next_state_samples)
@@ -206,7 +255,7 @@ def train_critic( critic_1, critic_2, critic_optimizer_1, critic_optimizer_2, st
     return critic_loss_1.item(), critic_loss_2.item()
 
 
-def train_actor( actor, critic_1, critic_2, actor_optimizer, state_samples):
+def train_actor( actor, critic_1, critic_2, actor_optimizer, state_samples, alpha):
     
     
     action, _, action_log_probs = actor.select_action(state_samples)
@@ -246,7 +295,7 @@ def train_actor( actor, critic_1, critic_2, actor_optimizer, state_samples):
     
     
 
-def update_target_critic(critic_target_1, critic_target_2, critic_1, critic_2):
+def update_target_critic(critic_target_1, critic_target_2, critic_1, critic_2, rho):
     
     for target_param, param in zip(critic_target_1.parameters(), critic_1.parameters()):
         target_param.data.copy_(rho * target_param.data + (1 - rho) * param.data)
@@ -259,14 +308,22 @@ def update_target_critic(critic_target_1, critic_target_2, critic_1, critic_2):
       
 
 
-
+'''
+was
 def get_train_data( agent_actual_memory , env_attributes ):
-        
+       
     sample_size = int( env_attributes["batch_size"] )
     
     states_1, actions_1, _, rewards_1, next_states_1, done_1 =  agent_actual_memory.sample_memory(  sample_size = sample_size)
     
     return states_1 [ :,  env_attributes["state_mask"] ] , actions_1 [ :,  env_attributes["action_mask"] ] , rewards_1, next_states_1 [ :,  env_attributes["state_mask"] ] , done_1 #indices
     
-
-
+'''
+def get_train_data( agent_actual_memory , agent_attributes): 
+    
+    sample_size = int( agent_attributes["batch_size"] )
+    
+    states_1, actions_1, _, rewards_1, next_states_1, done_1 =  agent_actual_memory.sample_memory(  sample_size = sample_size)
+    
+    return states_1 [ :,  agent_attributes["state_mask"] ] , actions_1 [ :,  agent_attributes["action_mask"] ] , rewards_1, next_states_1 [ :,  agent_attributes["state_mask"] ] , done_1 #indices
+    
