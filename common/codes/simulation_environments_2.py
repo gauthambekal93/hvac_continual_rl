@@ -153,6 +153,7 @@ def bestest_hydronic_heat_pump(data_params, model_params):
                          "start_time_tests": start_time_tests,
                          "warmup_period" : warmup_period ,
                          "episode_length_test" : episode_length_test,
+                         "warmup_period_test":data_params["time_params"]["warmup_period_test"],
                          "random_start_time" : random_start_time,
                          "start_time_train": start_time_train, 
                          "device": torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

@@ -16,9 +16,13 @@ import random
 import time 
 
 import json
-from simulation_environments import bestest_hydronic_heat_pump
 
-from save_results import save_models, save_train_results, save_test_results
+#from simulation_environments import bestest_hydronic_heat_pump
+from simulation_environments_2 import bestest_hydronic_heat_pump
+
+#from save_results import save_models, save_train_results, save_test_results
+
+from save_results_2 import save_models, save_train_results, save_test_results
 
 from train_agent import initialize_agent, load_models , collect_from_actual_env, compute_target, train_critic, train_actor, update_target_critic, get_train_data
 
@@ -53,15 +57,17 @@ if __name__ == '__main__':
      
     data_config_path = os.path.join(project_root, "configuration_files","data", "task_1","stage_1_action_heat.json") 
     
-    model_config_path = os.path.join(project_root, "configuration_files","models", "task_1", "model_free_sac", "2.json") 
+    model_config_path = os.path.join(project_root, "configuration_files","models", "task_1", "model_free_sac", "0.json") 
     
     data_params, model_params = get_configurations(data_config_path, model_config_path)
 
-    set_seed(model_params["seed"])
+    env,  real_env_attributes, agent_attributes  = bestest_hydronic_heat_pump( data_params, model_params)
     
-    env,  env_attributes  = bestest_hydronic_heat_pump( data_params, model_params)
+    set_seed(model_params["rl_agent"]["seed"])
     
+    #was env,  env_attributes  = bestest_hydronic_heat_pump( data_params, model_params)
     
+    ''' was
     n_training_episodes = int( env_attributes['n_training_episodes'] )
 
     max_t = int(env_attributes['max_t'])
@@ -71,12 +77,30 @@ if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
     metrics_path = model_params["metrics_path"]
+    '''
+    
+    n_training_episodes = agent_attributes['n_training_episodes'] 
+
+    max_t = agent_attributes['max_t']
+
+    gamma = agent_attributes['gamma']
+   
+    alpha = agent_attributes["alpha"]
+    
+    rho = agent_attributes["rho"]
+    
+    device = real_env_attributes["device"]
+    
+    metrics_path = agent_attributes["metrics_path"]
+    
     
     print("Device ", device)
     
     """Initialize and load the RL model and memory """
-    actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory = initialize_agent(env_attributes)
-
+    #was actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory = initialize_agent(env_attributes)
+    
+    actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory = initialize_agent(real_env_attributes, agent_attributes)
+    
     #actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, last_loaded_episode = load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, env_attributes)
 
     last_loaded_episode = 0
@@ -123,7 +147,8 @@ if __name__ == '__main__':
                 if time_step % 100 == 0:  
                     print("Episode: ", i_episode, time_step, "No of memory elements: ",len(agent_actual_memory.states) )
                 
-                action, discrete_action, _ = actor.select_action(state [ env_attributes["state_mask"] ] )
+                #was action, discrete_action, _ = actor.select_action(state [ env_attributes["state_mask"] ] 
+                action, discrete_action, _ = actor.select_action(state [ agent_attributes["state_mask"] ] )
                 
                 next_state, reward, done = collect_from_actual_env( env, discrete_action )  
                 
@@ -137,17 +162,21 @@ if __name__ == '__main__':
            
                 if True:        
     
-                    for _ in range(env_attributes["no_of_updates"]):
+                    #was for _ in range(env_attributes["no_of_updates"]):
+                    
+                    for _ in range(agent_attributes["no_of_updates"]):
                         
-                        batch_states, batch_actions, batch_rewards, batch_next_states, batch_done = get_train_data( agent_actual_memory , env_attributes )
-                     
-                        q_val_target = compute_target( actor, critic_target_1, critic_target_2, batch_rewards, batch_next_states, batch_done, gamma )
+                        #was batch_states, batch_actions, batch_rewards, batch_next_states, batch_done = get_train_data( agent_actual_memory , env_attributes )
+                        
+                        batch_states, batch_actions, batch_rewards, batch_next_states, batch_done = get_train_data( agent_actual_memory , agent_attributes )
+                        
+                        q_val_target = compute_target( actor, critic_target_1, critic_target_2, batch_rewards, batch_next_states, batch_done, gamma, alpha )
                         
                         l1, l2 = train_critic( critic_1, critic_2, critic_optimizer_1, critic_optimizer_2, batch_states, batch_actions , q_val_target )
                         
-                        a1 = train_actor(actor, critic_1, critic_2, actor_optimizer, batch_states) 
+                        a1 = train_actor(actor, critic_1, critic_2, actor_optimizer, batch_states, alpha) 
                         
-                        update_target_critic(critic_target_1, critic_target_2, critic_1, critic_2)
+                        update_target_critic(critic_target_1, critic_target_2, critic_1, critic_2, rho)
                         
                         episode_critic_1_loss.append(l1)
                         
@@ -162,15 +191,20 @@ if __name__ == '__main__':
             
             train_time = train_time + ( time.time() - start_time)            
             
-            save_train_results(i_episode, train_time, episode_rewards, plot_scores_train, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, data_params, model_params, env_attributes , env )
+            #was save_train_results(i_episode, train_time, episode_rewards, plot_scores_train, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, data_params, model_params, env_attributes , env )
             
-            save_test_results(i_episode, env, env_attributes, data_params, model_params, actor) 
-             
-            save_models(i_episode, model_params, actor,actor_optimizer,critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory) 
-    
+            #was save_test_results(i_episode, env, env_attributes, data_params, model_params, actor) 
+                    
+            #was save_models(i_episode, model_params, actor,actor_optimizer,critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory) 
+                
 
+            save_train_results(i_episode, train_time, episode_rewards, plot_scores_train, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, real_env_attributes, agent_attributes , env )
+                        
+            save_test_results(i_episode, env, real_env_attributes, agent_attributes , actor)
+
+            save_models(i_episode, actor, actor_optimizer, critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory, agent_attributes)
+                
     
     
-    
-    
+             
     

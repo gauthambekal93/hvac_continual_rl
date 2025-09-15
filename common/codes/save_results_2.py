@@ -9,7 +9,7 @@ import os
 
 import torch
 import csv
-import os
+#import os
 import datetime
 import time
 #import matplotlib.pyplot as plt
@@ -27,30 +27,42 @@ test_jan17_time, test_apr19_time, test_nov15_time, test_dec08_time = 0, 0, 0, 0
 
 
 
-def save_models(i_episode, agent_attributes, actor, actor_optimizer, critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory):
+def save_models(i_episode, actor, actor_optimizer, critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory, agent_attributes, learnt_env_attributes = None, realT_zon_model = None, reward_model = None):
     
-    model_path = agent_attributes["model_path"]
+    rl_model_path = agent_attributes["model_path"]
     
     print("save policy model....")
     
     checkpoint = { 'model_state_dict': actor.state_dict(),  'optimizer_state_dict': actor_optimizer.state_dict() }
     
-    torch.save(checkpoint, model_path+'actor_model_'+str(i_episode)+'_.pkl')
+    torch.save(checkpoint, rl_model_path+'actor_model_'+str(i_episode)+'_.pkl')
     
 
     checkpoint = { 'model_state_dict': critic_1.state_dict(),  'optimizer_state_dict': critic_optimizer_1.state_dict() }
     
-    torch.save(checkpoint, model_path+'critic_model_1_'+str(i_episode)+'_.pkl')       
+    torch.save(checkpoint, rl_model_path+'critic_model_1_'+str(i_episode)+'_.pkl')       
     
     
     checkpoint = { 'model_state_dict': critic_2.state_dict(),  'optimizer_state_dict': critic_optimizer_2.state_dict() }
     
-    torch.save(checkpoint,  model_path + 'critic_model_2_'+str(i_episode)+'_.pkl')    
+    torch.save(checkpoint,  rl_model_path + 'critic_model_2_'+str(i_episode)+'_.pkl')    
     
    
-    with open(model_path + "agent_actual_data.pkl" , "wb") as f:
+    with open(rl_model_path + "agent_actual_data.pkl" , "wb") as f:
       pickle.dump(agent_actual_memory, f)
+    
+    if learnt_env_attributes is None:
+        return 
+    
+    env_model_path = learnt_env_attributes["model_path"]
+    
+    checkpoint = { 'model_state_dict': realT_zon_model.hypernet.state_dict(),  'optimizer_state_dict': realT_zon_model.hypernet_optimizer.state_dict() }
       
+    torch.save(checkpoint,  env_model_path + 'realT_zon_model_'+str(i_episode)+'_.pkl')    
+      
+    checkpoint = { 'model_state_dict': reward_model.hypernet.state_dict(),  'optimizer_state_dict': reward_model.hypernet_optimizer.state_dict() }
+      
+    torch.save(checkpoint,  env_model_path + 'reward_model_'+str(i_episode)+'_.pkl')
      
 
 def plot_and_save_specific(plt, day_of_year, specific_result_path, i_episode, save_to_file, data_type ):
@@ -70,11 +82,12 @@ def plot_and_save_overall(plt, env, env_type, consolidated_result_path, metrics_
             
         writer = csv.writer(file)   
         
-   
         if i_episode % 1 == 0:
-             print("=========Train=========")
-              
+             
              if type_of_data=="train":
+                 
+                 print("=========Train=========")
+                 
                  print("Actor Loss ", np.mean(episode_actor_loss) , "Critic 1 Loss ", np.mean(episode_critic_1_loss),"Critic 2 Loss ", np.mean(episode_critic_2_loss))
              
                  print("KPIs \n ",  env.get_kpis() )
@@ -128,8 +141,8 @@ def save_train_results(i_episode, train_time, episode_rewards, plot_scores_train
 def save_test_results(i_episode, env, real_env_attributes, agent_attributes , actor):
     
     metrics_path = agent_attributes["metrics_path"]
-    exp_path = agent_attributes["exp_path"]
-     
+    specific_result_path = agent_attributes["individual_test_results"] 
+    consolidated_result_path = agent_attributes["consolidated_results"]
     
     max_episode_length = real_env_attributes["max_episode_length"]
     
@@ -165,9 +178,9 @@ def save_test_results(i_episode, env, real_env_attributes, agent_attributes , ac
     
     test_jan17_time = test_jan17_time + (time.time() - start)
     
-    plot_and_save_specific(plt, day_of_year, exp_path, i_episode, save_to_file, data_type = "Test")       
+    plot_and_save_specific(plt, day_of_year, specific_result_path, i_episode, save_to_file, data_type = "Test")       
     
-    plot_and_save_overall(plt, env, env_type, exp_path, metrics_path, i_episode, plot_scores_test_jan17, max_episode_length, day_of_year, "NA" , "NA", "NA" , "NA", test_jan17_time, test_date, 'test_jan17')
+    plot_and_save_overall(plt, env, env_type, consolidated_result_path, metrics_path, i_episode, plot_scores_test_jan17, max_episode_length, day_of_year, "NA" , "NA", "NA" , "NA", test_jan17_time, test_date, 'test_jan17')
   
     
   
@@ -192,9 +205,9 @@ def save_test_results(i_episode, env, real_env_attributes, agent_attributes , ac
     
     test_apr19_time = test_apr19_time + (time.time() - start)
     
-    plot_and_save_specific(plt, day_of_year, exp_path, i_episode, save_to_file, data_type = "Test")
+    plot_and_save_specific(plt, day_of_year, specific_result_path, i_episode, save_to_file, data_type = "Test")
     
-    plot_and_save_overall(plt, env, env_type, exp_path, metrics_path, i_episode, plot_scores_test_apr19, max_episode_length, day_of_year, "NA" , "NA", "NA" , "NA", test_apr19_time, test_date, 'test_apr19')
+    plot_and_save_overall(plt, env, env_type, consolidated_result_path, metrics_path, i_episode, plot_scores_test_apr19, max_episode_length, day_of_year, "NA" , "NA", "NA" , "NA", test_apr19_time, test_date, 'test_apr19')
 
     
   

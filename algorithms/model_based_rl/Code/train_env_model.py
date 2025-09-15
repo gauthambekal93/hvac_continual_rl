@@ -225,11 +225,12 @@ def train_neuralnet(model, env_memory, learnt_env_attributes ):
            
     validation_loss, validation_predictions = validate_model( model.hypernet, model.target_model, validation_X, validation_y, task_index , no_of_models)
              
-    print("Model: " ,model.name, "Hypernet Validation Loss: ", validation_loss)
+    #print("Model: " ,model.name, "Hypernet Validation Loss: ", validation_loss)
     
-    print("------------------------------------------------------------------------------------")        
+    #print("------------------------------------------------------------------------------------")        
     
-    checkpoint = { 'model_state_dict': model.hypernet.state_dict(),  'optimizer_state_dict': model.hypernet_optimizer.state_dict() }
+    #checkpoint = { 'model_state_dict': model.hypernet.state_dict(),  'optimizer_state_dict': model.hypernet_optimizer.state_dict(), "current_loss": validation_loss }
     
-    torch.save(checkpoint, model_path + "Task_No_{0}_hypernet_{1}.pkl".format(task_index, model.name) )
+    #torch.save(checkpoint, model_path + "Task_No_{0}_hypernet_{1}.pkl".format(task_index, model.name) )
                  
+    return model, validation_loss
