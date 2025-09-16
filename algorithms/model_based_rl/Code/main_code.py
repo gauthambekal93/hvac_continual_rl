@@ -154,18 +154,18 @@ if __name__ == '__main__':
                 episode_rewards.append(reward)
 
 
-                '''
+                
                 if (len(env_memory_train.states_train) >0) and (len(env_memory_train.states_validation) >0):    
                     
-                    reward_model_loss, reward_model  = train_neuralnet(reward_model, env_memory_train, learnt_env_attributes) 
+                    reward_model, reward_model_loss  = train_neuralnet(reward_model, env_memory_train, learnt_env_attributes) 
                         
-                    zone_temp_loss, realT_zon_model  = train_neuralnet(realT_zon_model, env_memory_train, learnt_env_attributes ) 
+                    realT_zon_model, zone_temp_loss  = train_neuralnet(realT_zon_model, env_memory_train, learnt_env_attributes ) 
                     
                 
                 if time_step % 100 == 0:  
                     print("Episode: ", i_episode, time_step, "Reward Loss: ",reward_model_loss, "Zone temp Loss: ", zone_temp_loss)
                
-                '''
+                
                 if time_step % 100 == 0:  
                     print(time_step)
                     
