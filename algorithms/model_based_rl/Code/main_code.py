@@ -201,11 +201,11 @@ if __name__ == '__main__':
             train_time = train_time + ( time.time() - start_time)                
             
             
-            save_train_results(i_episode, train_time, episode_rewards, plot_scores_train, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, real_env_attributes, agent_attributes , env )
+            #save_train_results(i_episode, train_time, episode_rewards, plot_scores_train, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, real_env_attributes, agent_attributes , env )
             
-            save_test_results(i_episode, env, real_env_attributes, agent_attributes , actor)
+            #save_test_results(i_episode, env, real_env_attributes, agent_attributes , actor)
     
-            save_models(i_episode, actor, actor_optimizer, critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory, agent_attributes, learnt_env_attributes, realT_zon_model, reward_model)
+            #save_models(i_episode, actor, actor_optimizer, critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory, agent_attributes, learnt_env_attributes, realT_zon_model, reward_model)
     
     
     

@@ -127,31 +127,31 @@ def initialize_agent(real_env_attributes, agent_attributes):
 
 
      
-def load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, env_attributes):     
+def load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, agent_attributes):     
      
-     exp_path = None  # THIS PATH WILL COME FROM main_code and needs to be updated !!!
-    
-     model_files = [f for f in os.listdir(exp_path + '/Models/' ) if f.startswith('actor_model_') and f.endswith('.pkl')]
+     #exp_path = None  # THIS PATH WILL COME FROM main_code and needs to be updated !!!
+     model_path = agent_attributes["model_path"]
+     model_files = [f for f in os.listdir(model_path ) if f.startswith('actor_model_') and f.endswith('.pkl')]
      
      if len(model_files) > 0: 
          
          last_loaded_epoch = max( [int(re.search(r'actor_model_(\d+)', f).group(1)) for f in model_files] )
          
-         checkpoint = torch.load(exp_path + '/Models/'+'actor_model_'+str(last_loaded_epoch )+'_.pkl')
+         checkpoint = torch.load(model_path+'actor_model_'+str(last_loaded_epoch )+'_.pkl')
         
          actor.load_state_dict(checkpoint['model_state_dict'])
          
          actor_optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     
     
-         checkpoint = torch.load(exp_path + '/Models/'+'critic_model_1_'+str(last_loaded_epoch)+'_.pkl')
+         checkpoint = torch.load(model_path +'critic_model_1_'+str(last_loaded_epoch)+'_.pkl')
          
          critic_1.load_state_dict(checkpoint['model_state_dict'])
          
          critic_optimizer_1.load_state_dict(checkpoint['optimizer_state_dict'])
          
          
-         checkpoint = torch.load(exp_path + '/Models/'+'critic_model_2_'+str(last_loaded_epoch)+'_.pkl')
+         checkpoint = torch.load(model_path +'critic_model_2_'+str(last_loaded_epoch)+'_.pkl')
          
          critic_2.load_state_dict(checkpoint['model_state_dict'])
          
@@ -172,8 +172,8 @@ def load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, 
      else:
          last_loaded_epoch = 0
          
-     if os.path.exists (exp_path + '/Models/'+"agent_actual_data.pkl"):   
-         with open(exp_path + '/Models/'+"agent_actual_data.pkl", "rb") as f:
+     if os.path.exists (model_path+"agent_actual_data.pkl"):   
+         with open(model_path+"agent_actual_data.pkl", "rb") as f:
             agent_actual_memory = pickle.load(f)
      
              

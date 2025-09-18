@@ -56,7 +56,7 @@ class Actor(nn.Module):
         
     def sampled_action(self, mu, std, no_samples ):
         
-        noise_samples = self.normal_dist.sample( sample_shape = ( mu.shape[0], no_samples )  ) 
+        noise_samples = self.normal_dist.sample( sample_shape = ( mu.shape[0], no_samples ) ).to( torch.device("cuda:0" if torch.cuda.is_available() else "cpu")) 
         
         sampled_actions =   ( mu ) + (noise_samples * std) 
         
@@ -74,7 +74,7 @@ class Actor(nn.Module):
     
     def discretize_action(self, continuous_actions):
         # Map each continuous action value to the closest bin
-        discrete_actions = np.digitize(continuous_actions.detach().numpy(), self.bins) - 1
+        discrete_actions = np.digitize(continuous_actions.detach().cpu().numpy(), self.bins) - 1
         
         return discrete_actions
     
@@ -83,10 +83,10 @@ class Actor(nn.Module):
     def select_action(self, state, no_samples = 1):
     
         if state.ndim ==1:
-            state = state. reshape(1,-1)
+            state = state. reshape(1,-1) #.to(  torch.device("cuda:0" if torch.cuda.is_available() else "cpu") )
         
         if not torch.is_tensor(state):    
-            state = torch.tensor(state).to("cpu")
+            state = torch.tensor(state).to( torch.device("cuda:0" if torch.cuda.is_available() else "cpu")) #was "cpu"
 
         mu, std = self.forward(state)
         

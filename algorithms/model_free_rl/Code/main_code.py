@@ -57,7 +57,7 @@ if __name__ == '__main__':
      
     data_config_path = os.path.join(project_root, "configuration_files","data", "task_1","stage_1_action_heat.json") 
     
-    model_config_path = os.path.join(project_root, "configuration_files","models", "task_1", "model_free_sac", "0.json") 
+    model_config_path = os.path.join(project_root, "configuration_files","models", "task_1", "model_free_sac", "1.json") 
     
     data_params, model_params = get_configurations(data_config_path, model_config_path)
 
@@ -65,19 +65,6 @@ if __name__ == '__main__':
     
     set_seed(model_params["rl_agent"]["seed"])
     
-    #was env,  env_attributes  = bestest_hydronic_heat_pump( data_params, model_params)
-    
-    ''' was
-    n_training_episodes = int( env_attributes['n_training_episodes'] )
-
-    max_t = int(env_attributes['max_t'])
-
-    gamma = float(env_attributes['gamma'])
-
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    
-    metrics_path = model_params["metrics_path"]
-    '''
     
     n_training_episodes = agent_attributes['n_training_episodes'] 
 
@@ -101,7 +88,7 @@ if __name__ == '__main__':
     
     actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory = initialize_agent(real_env_attributes, agent_attributes)
     
-    #actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, last_loaded_episode = load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, env_attributes)
+    actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, last_loaded_episode = load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, agent_attributes)
 
     last_loaded_episode = 0
        
@@ -111,8 +98,8 @@ if __name__ == '__main__':
         temp = temp.loc[temp['episode']<=last_loaded_episode ]
         temp.to_csv(metrics_path, index = False)
         
-        filtered_df = temp.loc[temp["Type"] == "Train", ["episode", "extrinsic_reward"]]
-        plot_scores_train_extrinsic = filtered_df.set_index("episode")["extrinsic_reward"].to_dict()
+        filtered_df = temp.loc[temp["Type"] == "Train", ["episode", "reward"]]
+        plot_scores_train_extrinsic = filtered_df.set_index("episode")["reward"].to_dict()
         
         if len(temp)>0:
            train_time = temp.loc[ temp["Type"] == "Train"]['time_steps'].iloc[-1]
@@ -191,12 +178,6 @@ if __name__ == '__main__':
             
             train_time = train_time + ( time.time() - start_time)            
             
-            #was save_train_results(i_episode, train_time, episode_rewards, plot_scores_train, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, data_params, model_params, env_attributes , env )
-            
-            #was save_test_results(i_episode, env, env_attributes, data_params, model_params, actor) 
-                    
-            #was save_models(i_episode, model_params, actor,actor_optimizer,critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory) 
-                
 
             save_train_results(i_episode, train_time, episode_rewards, plot_scores_train, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, real_env_attributes, agent_attributes , env )
                         
