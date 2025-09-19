@@ -17,8 +17,14 @@ results/boptest_hydronic_heat_pump/task_1/model_free_sac/0_old
 results/boptest_hydronic_heat_pump/task_1/model_free_sac/1_old
 results/boptest_hydronic_heat_pump/task_1/model_free_sac/2_old
 
-results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/individual_train_results
-results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/individual_test_results
+results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/individual_train_results/
+results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/individual_test_results/
+
+results/boptest_hydronic_heat_pump/task_1/model_free_sac/1/individual_train_results/
+results/boptest_hydronic_heat_pump/task_1/model_free_sac/1/individual_test_results/
+
+results/boptest_hydronic_heat_pump/task_1/model_free_sac/2/individual_train_results/
+results/boptest_hydronic_heat_pump/task_1/model_free_sac/2/individual_test_results/
 
 
 results/boptest_hydronic_heat_pump/task_1/model_based_sac/0/individual_train_results/
