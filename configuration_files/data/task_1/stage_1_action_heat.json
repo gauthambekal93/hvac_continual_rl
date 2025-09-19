@@ -2,8 +2,8 @@
   "env_type":"bestest_hydronic_heat_pump",
 
   "urls": {
-    "base_url": "http://127.0.0.1:5000",
-    "operational_data": "http://127.0.0.1:5000/initialize"
+    "base_url": "http://127.0.0.1:80",
+    "operational_data": "http://127.0.0.1:80/initialize"
   },
 
   "time_params": {

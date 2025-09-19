@@ -18,12 +18,12 @@
      "multiplicative_factor": 1,
      "batch_size": 1024, 
      "no_of_updates": 2,
-     "metrics_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/metrics.csv",
-     "exp_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0",
-     "model_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/Models/rl_models/",
-     "individual_train_results":"C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/individual_train_results/",
-     "individual_test_results":"C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/individual_test_results/",
-     "consolidated_results":"C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/consolidated_results/",
+     "metrics_path": "C:/Users/ahmed/Documents/GitHub/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/metrics.csv",
+     "exp_path": "C:/Users/ahmed/Documents/GitHub/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/",
+     "model_path":"C:/Users/ahmed/Documents/GitHub/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/Models/rl_models/",
+     "individual_train_results":"C:/Users/ahmed/Documents/GitHub/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/individual_train_results/",
+     "individual_test_results":"C:/Users/ahmed/Documents/GitHub/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/individual_test_results/",
+     "consolidated_results":"C:/Users/ahmed/Documents/GitHub/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/consolidated_results/",
      "save_to_file": "True",
      "plot": "True"
 

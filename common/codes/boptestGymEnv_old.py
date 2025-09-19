@@ -5,8 +5,19 @@ Created on Jun 4, 2020
 
 '''
 
-import matplotlib.pyplot as plt
+import os
+
+import numpy as np
+import torch
 import random
+
+seed = 42
+np.random.seed(seed)
+torch.manual_seed(seed) 
+random.seed(seed)  
+
+
+#import matplotlib.pyplot as plt
 import gymnasium as gym
 import requests
 import numpy as np
@@ -25,6 +36,13 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 #from examples.test_and_plot import plot_results, test_agent
 
+#with open('twozone_apartment_hydronic/result_paths.json', 'r') as openfile:
+#    json_data = json.load(openfile)
+
+#result_path = json_data['experiment_result_path']
+
+     
+     
 class BoptestGymEnv(gym.Env):
     '''
     BOPTEST Environment that follows gym interface.
@@ -36,8 +54,7 @@ class BoptestGymEnv(gym.Env):
     metadata = {'render.modes': ['console']}
 
     def __init__(self, 
-                 url                = 'http://127.0.0.1:80',
-                 testcase           = 'bestest_hydronic_heat_pump',
+                 url                = 'http://127.0.0.1:5000',
                  actions            = ['oveHeaPumY_u'],
                  observations       = {'reaTZon_y':(280.,310.)}, 
                  reward             = ['reward'],
@@ -47,19 +64,21 @@ class BoptestGymEnv(gym.Env):
                  regressive_period  = None,
                  predictive_period  = None,
                  start_time         = 0,
+                 train_periods      = None,
                  warmup_period      = 0,
                  scenario           = {'electricity_price':'constant'},
                  step_period        = 900,
                  render_episodes    = False,
                  log_dir            = os.getcwd(),
-                 train_periods = None):
+                # points = ['reaTZon_y','reaTSetHea_y','reaTSetCoo_y','oveHeaPumY_u', 'weaSta_reaWeaTDryBul_y', 'weaSta_reaWeaHDirNor_y'] ,
+                points =  ['ahu_oveFanRet_u','ahu_oveFanSup_u','oveValCoi_u','oveValRad_u','oveTZonSet_u', 'reaOcc_y','reaTZon_y','reaCO2Zon_y','ahu_reaFloSupAir_y','ahu_reaPFanRet_y','weaSta_reaWeaTDryBul_y','weaSta_reaWeaTWetBul_y'],
+                 testcase = 'singlezone_commercial_hydronic'
+                 ):
         '''
         Parameters
         ----------
         url: string
             Rest API url for communication with the BOPTEST interface
-        testcase: string
-            The string identifier of the testcase
         actions: list
             List of strings indicating the action space. The bounds of 
             each variable from the action space the are retrieved from 
@@ -90,7 +109,8 @@ class BoptestGymEnv(gym.Env):
             end time of the periods that should not overlap with any 
             episode used for training. Example:
             excluding_periods = [(31*24*3600,  31*24*3600+14*24*3600),
-                                (304*24*3600, 304*24*3600+14*24*3600)]
+                                (304*24*3600, 304*24*3600+14*24*3600)
+                                ]
             This is only used when `random_start_time=True`
         regressive_period: integer, default is None
             Number of seconds for the regressive horizon. The observations
@@ -138,23 +158,24 @@ class BoptestGymEnv(gym.Env):
         super(BoptestGymEnv, self).__init__()
         
         self.url                = url
-        self.testcase           = testcase
         self.actions            = actions
         self.observations       = list(observations.keys())
         self.max_episode_length = max_episode_length
         self.random_start_time  = random_start_time
         self.excluding_periods  = excluding_periods
         self.start_time         = start_time
+        self.train_periods      = train_periods
         self.warmup_period      = warmup_period
         self.reward             = reward
         self.predictive_period  = predictive_period
         self.regressive_period  = regressive_period
         self.step_period        = step_period
         self.scenario           = scenario
-        self.render_episodes    = render_episodes
+        #self.render_episodes    = render_episodes
         self.log_dir            = log_dir
-        self.train_periods      = train_periods
-        
+        self.points = points 
+        self.testcase = testcase
+        self.all_actions = []     #I added this variable for diagnostic procedure only
         # Avoid requesting data before the beginning of the year
         if self.regressive_period is not None:
             self.bgn_year_margin = self.regressive_period
@@ -166,26 +187,18 @@ class BoptestGymEnv(gym.Env):
         #=============================================================
         # Get test information
         #=============================================================
-        # Get testid for the particular testcase
-        # Check if already started a test case and stop it if so before starting another
-        try:
-            requests.put('{0}/stop/{1}'.format(url, self.testid))
-        except:
-            pass
-        # Select and start a new test case
-        self.testid = requests.post('{0}/testcases/{1}/select'.format(url, testcase)).json()['testid']
         # Test case name
-        self.name = requests.get('{0}/name/{1}'.format(url, self.testid)).json()['payload']
+        self.name = requests.get('{0}/name'.format(url)).json()['payload']
         # Measurements available
-        self.all_measurement_vars = requests.get('{0}/measurements/{1}'.format(url, self.testid)).json()['payload']
+        self.all_measurement_vars = requests.get('{0}/measurements'.format(url)).json()['payload']
         # Predictive variables available
-        self.all_predictive_vars = requests.get('{0}/forecast_points/{1}'.format(url, self.testid)).json()['payload']
+        self.all_predictive_vars = requests.get('{0}/forecast_points'.format(url)).json()['payload']
         # Inputs available
-        self.all_input_vars = requests.get('{0}/inputs/{1}'.format(url, self.testid)).json()['payload']
+        self.all_input_vars = requests.get('{0}/inputs'.format(url)).json()['payload']
         # Default simulation step
-        self.step_def = requests.get('{0}/step/{1}'.format(url, self.testid)).json()['payload']
+        self.step_def = requests.get('{0}/step'.format(url)).json()['payload']
         # Default scenario
-        self.scenario_def = requests.get('{0}/scenario/{1}'.format(url, self.testid)).json()['payload']
+        self.scenario_def = requests.get('{0}/scenario'.format(url)).json()['payload']
         
         #=============================================================
         # Define observation space
@@ -323,9 +336,9 @@ class BoptestGymEnv(gym.Env):
                                        high = np.array(self.upper_act_bounds), 
                                        dtype= np.float32)
         
-        if self.render_episodes:
-            plt.ion()
-            self.fig = plt.gcf()
+        #if self.render_episodes:
+        #    plt.ion()
+        #    self.fig = plt.gcf()
 
     def __str__(self):
         '''
@@ -429,7 +442,7 @@ class BoptestGymEnv(gym.Env):
         
         return summary
 
-    def reset(self, seed=None, options=None):
+    def reset(self, options=None, seed=None):
         '''
         Method to reset the environment. The associated building model is 
         initialized by running the baseline controller for a  
@@ -462,47 +475,36 @@ class BoptestGymEnv(gym.Env):
         def find_start_time(episode_no):
             
             return self.train_periods[episode_no]
-
-        """
+        '''
         def find_start_time():
-            '''Recursive method to find a random start time out of 
-            `excluding_periods`. An episode and an excluding_period that
-            are just touching each other are not considered as being 
-            overlapped. 
             
-            '''
-            start_time = random.randint(0+self.bgn_year_margin, 
-                                        3.1536e+7-self.end_year_margin)
-            episode = (start_time, start_time+self.max_episode_length)
-            if self.excluding_periods is not None:
-                for period in self.excluding_periods:
-                    if episode[0] < period[1] and period[0] < episode[1]:
-                        # There is overlapping between episode and this period
-                        # Try to find a good starting time again
-                        start_time = find_start_time()
-            # This point is reached only when a good starting point is found
-            return start_time
-        """
-        
+            while True:
+                start_time = random.randint(0+self.bgn_year_margin, 3.1536e+7-self.bgn_year_margin)  
+                
+                end_time = start_time + self.max_episode_length
+                
+                tmp = [ x for x in  self.excluding_periods if (start_time not in range(x[0], x[1]) ) and (end_time not in range(x[0], x[1]) ) ]
+                     
+                if len(tmp) == len(self.excluding_periods) :
+                    
+                    return start_time
+      '''      
+
         # Assign random start_time if it is None
-        #if self.random_start_time:
-        #    self.start_time = find_start_time()
-        
         if self.random_start_time:
             episode_no = options - 1
             self.start_time = find_start_time(episode_no)
-
-        
+   
         # Initialize the building simulation
-        res = requests.put('{0}/initialize/{1}'.format(self.url,self.testid),
+        res = requests.put('{0}/initialize'.format(self.url), 
                            json={'start_time':int(self.start_time),
                                  'warmup_period':int(self.warmup_period)}).json()['payload']
         
         # Set simulation step
-        requests.put('{0}/step/{1}'.format(self.url,self.testid), json={'step':int(self.step_period)})
+        requests.put('{0}/step'.format(self.url), json={'step':int(self.step_period)})
         
         # Set BOPTEST scenario
-        requests.put('{0}/scenario/{1}'.format(self.url,self.testid), json=self.scenario)
+        requests.put('{0}/scenario'.format(self.url), json=self.scenario)
         
         # Initialize objective integrand
         self.objective_integrand = 0.
@@ -511,27 +513,11 @@ class BoptestGymEnv(gym.Env):
         observations = self.get_observations(res)
         
         # Optionally we can pass additional info, we are not using that for now
-        info = {}
+        #info = {}
         
         self.episode_rewards = []
 
-        return observations, info
-
-    def stop(self):
-        '''
-        Stop the test case
-
-        '''
-
-        requests.put('{0}/stop/{1}'.format(self.url, self.testid))
-
-    def stop(self):
-        '''
-        Stop the test case
-
-        '''
-
-        requests.put('{0}/stop/{1}'.format(self.url, self.testid))
+        return observations, res
 
     def step(self, action):
         '''
@@ -571,6 +557,7 @@ class BoptestGymEnv(gym.Env):
 
         '''
         
+       # self.all_actions.append(action)  #I have added this logic for diagnostic purpose only !!!
         # Initialize inputs to send through BOPTEST Rest API
         u = {}
         
@@ -579,12 +566,27 @@ class BoptestGymEnv(gym.Env):
             # Assign value
             u[act] = float(action[i])
             
+            #if act == "oveHeaPumY_u":
             # Indicate that the input is active
             u[act.replace('_u','_activate')] = float(1)
                 
         # Advance a BOPTEST simulation
-        res = requests.post('{0}/advance/{1}'.format(self.url,self.testid), json=u).json()['payload']
-        
+        try:
+
+           res = requests.post('{0}/advance'.format(self.url), json=u).json()['payload']
+           
+           #NEED TO COMMENT THIS
+           #esult_path = r'C:/Users/gauthambekal93/Research/rl_collaboration_project/project1-boptest-gym-master/stable_baselines_results_MODEL_A2C/singlezone_commercial_hydronic' 
+           #with open(result_path + '/Actions.json', "a") as json_file:
+           #    json_file.write(json.dumps(res, indent=4) )    #was u
+               
+           #NEED TO UN COMMENT THIS
+          # with open(result_path + '/Actions.json', "a") as json_file:
+          #     json_file.write(json.dumps(res, indent=4) )    #was u
+          
+        except:
+            print("stop")
+            print("stop")
         # Compute reward of this (state-action-state') tuple
         reward = self.get_reward()
         self.episode_rewards.append(reward)
@@ -593,37 +595,49 @@ class BoptestGymEnv(gym.Env):
         terminated = self.compute_terminated(res, reward)
         
         # Optionally we can pass the truncated boolean but not used that for now
-        truncated = self.compute_truncated(res, reward)
-
+        try:
+            truncated = self.compute_truncated(res, reward)
+        except:
+            print("stop")
+            print("stop")
+            print("stop")
         # Optionally we can pass additional info, we are not using that for now
         info = {}
         
         # Get observations at the end of this time step
         observations = self.get_observations(res)
         
+        
+      #  if (terminated or truncated):
+      #      print("All actions ", self.all_actions)
+      #      self.all_actions = []
+          
         # Render episode if finished and requested
-        if (terminated or truncated) and self.render_episodes:
-            self.render()
+      #  if (terminated or truncated) and self.render_episodes:
+           
+       #     self.render()
         
-        return observations, reward, terminated, truncated, info
+        #return observations, reward, terminated, truncated, info
+        return observations, reward, truncated, terminated, res, #info   #info is commented and we insted and returning res
     
-    def render(self, mode='episodes'):
-        '''
-        Renders the process evolution 
+    #def render(self, mode='episodes'):
+    #    '''
+    #    Renders the process evolution 
         
-        Parameters
-        ----------
-        mode: string
-            Mode to be used for the renderization
+    #    Parameters
+    #    ----------
+    #    mode: string
+    #        Mode to be used for the renderization
         
-        '''
-        if mode != 'episodes':
-            raise NotImplementedError()
-        else:
-            plt.ion()
-            self.fig = plt.gcf()
-            self.fig.clear()
-            plot_results(self, self.episode_rewards, log_dir=self.log_dir)
+    #    '''
+     #   if mode != 'episodes':
+     #       raise NotImplementedError()
+     #   else:
+     #       plt.ion()
+     #       self.fig = plt.gcf()
+     #       self.fig.clear()
+     #       plot_results(self, self.episode_rewards,  points = self.points,  log_dir=self.log_dir, testcase = self.testcase )
+            #print("self.episode_rewards ", self.episode_rewards)
 
     def close(self):
         pass
@@ -654,21 +668,44 @@ class BoptestGymEnv(gym.Env):
         
         '''
         
-        # Define a relative weight for the discomfort 
-        w = 1
-        
         # Compute BOPTEST core kpis
-        kpis = requests.get('{0}/kpi/{1}'.format(self.url,self.testid)).json()['payload']
+        kpis = requests.get('{0}/kpi'.format(self.url)).json()['payload']
+        # Define a relative weight for the discomfort 
         
+        w1 = 0 #was 1
+        w2 = 0
+        w3 = 0 #was 1
+        w4 = 1 #was 0.1
+        w5 = 0
         # Calculate objective integrand function at this point
-        objective_integrand = kpis['cost_tot'] + w*kpis['tdis_tot']
-        
+        objective_integrand = w1*kpis['cost_tot'] + w2*kpis['emis_tot'] + w3*kpis['ener_tot'] + w4*kpis['tdis_tot'] + w5*kpis['idis_tot']
+    
         # Compute reward
         reward = -(objective_integrand - self.objective_integrand)
         
         self.objective_integrand = objective_integrand
         
+        '''
+        # Compute BOPTEST core kpis
+        # Calculate objective integrand function as the total discomfort
+        objective_integrand = kpis['cost_tot'] # was tdis_tot #cost_tot
+        
+        #print("Current Cost ", objective_integrand, "Previous discomfort ",self.objective_integrand)
+        
+        # Give reward if there is not immediate increment in discomfort
+        
+        if objective_integrand == self.objective_integrand:   #make this < and try out
+          reward=1
+          print("")
+          print("")
+        else:
+          reward=0
+        # Record current objective integrand for next evaluation
+        self.objective_integrand = objective_integrand
+        '''
+        
         return reward
+    
 
     def compute_terminated(self, res, reward=None):
         '''
@@ -715,9 +752,12 @@ class BoptestGymEnv(gym.Env):
         method for `compute_truncated`. 
         
         '''
-        
-        truncated = res['time'] >= self.start_time + self.max_episode_length
-        
+        try:
+           truncated = res['time'] >= self.start_time + self.max_episode_length
+        except:
+            print("stop")
+            print("stop")
+            print("stop")
         return truncated
 
     def get_observations(self, res):
@@ -756,7 +796,7 @@ class BoptestGymEnv(gym.Env):
         if self.is_regressive:
             regr_index = res['time']-self.step_period*np.arange(1,self.regr_n+1)
             for var in self.regressive_vars:
-                res_var = requests.put('{0}/results/{1}'.format(self.url, self.testid), 
+                res_var = requests.put('{0}/results'.format(self.url), 
                                        json={'point_names':[var],
                                              'start_time':int(regr_index[-1]), 
                                              'final_time':int(regr_index[0])}).json()['payload']
@@ -772,7 +812,7 @@ class BoptestGymEnv(gym.Env):
 
         # Get predictions if this is a predictive agent. 
         if self.is_predictive:
-            predictions = requests.put('{0}/forecast/{1}'.format(self.url, self.testid), 
+            predictions = requests.put('{0}/forecast'.format(self.url), 
                                        json={'point_names': self.predictive_vars,
                                              'horizon':     int(self.predictive_period),
                                              'interval':    int(self.step_period)}).json()['payload']
@@ -793,7 +833,7 @@ class BoptestGymEnv(gym.Env):
         '''
         
         # Compute BOPTEST core kpis
-        kpis = requests.get('{0}/kpi/{1}'.format(self.url, self.testid)).json()['payload']
+        kpis = requests.get('{0}/kpi'.format(self.url)).json()['payload']
         
         return kpis
     
@@ -1025,8 +1065,8 @@ class DiscretizedActionWrapper(gym.ActionWrapper):
         env: gym.Env
             Original gym environment
         n_bins_obs: integer
-            Number of bins to be used in the transformed action space
-            for each action. 
+            Number of bins to be used in the transformed observation space
+            for each observation. 
         
         '''
         
@@ -1047,53 +1087,10 @@ class DiscretizedActionWrapper(gym.ActionWrapper):
         self.n_act = low.flatten().shape[0]
         
         # Obtain values of discretized action space
-        self.val_bins_act   = [np.linspace(l, h, n_bins_act + 1) for l, h in
-                               zip(low.flatten(), high.flatten())]
+        self.val_bins_act   = [np.linspace(l, h, n_bins_act + 1) for l, h in zip(low.flatten(), high.flatten())]
         
         # Instantiate discretized action space
         self.action_space = spaces.Discrete((n_bins_act+1) ** self.n_act)
-        
-    def _get_indices(self, action_wrapper):
-        """
-        Returns the indices of the discretized action space corresponding to the given action wrapper.
-        
-        Parameters
-        ----------
-        action_wrapper : int
-            The action wrapper value to be converted to indices.
-        
-        Returns
-        -------
-        list
-            A list of indices representing the discretized action space.
-
-        Example
-        -------
-        Suppose:
-        self.n_act = 3 (number of actions)
-        self.n_bins_act = 3 (number of bins per action, this means 4 values possible per action)
-        self.val_bins_act = [[0, 1, 2, 3], [10, 11, 12, 13], [20, 21, 22, 23]] (value bins for each action)
-        
-        Then, `_get_indices` example, for action_wrapper = 37:
-        indices = []
-        Loop 3 times:
-        Iteration 1: indices.append((37 % (3+1)) -> indices = [1], action_wrapper //= 4 -> action_wrapper = 9
-        Iteration 2: indices.append((9 % (3+1)) -> indices = [1, 1], action_wrapper //= 4 -> action_wrapper = 2
-        Iteration 3: indices.append((2 % (3+1)) -> indices = [1, 1, 2], action_wrapper //= 4 -> action_wrapper = 0
-        Reverse indices: [2, 1, 1]
-
-        Note
-        ----
-        To understand why we need to add 1 in `action_wrapper%(self.n_bins_act+1)` think of the edge case
-        where we only have one bin. If the action_wrapper is 1, then the index should be 1, but if we do not
-        add 1 to `self.n_bins_act`, the index would be 0 (because 1%1=0). The underlying reason is that 
-        n_bins_act is the number of bins, not the number of possible action values.
-        """
-        indices=[]
-        for _ in range(self.n_act):
-            indices.append(action_wrapper%(self.n_bins_act+1))
-            action_wrapper //= self.n_bins_act
-        return indices[::-1]    
 
     def action(self, action_wrapper):
         '''This method accepts a single parameter (the modified action
@@ -1112,34 +1109,32 @@ class DiscretizedActionWrapper(gym.ActionWrapper):
         
         Notes
         -----
-        To better understand what this method needs to do, see what the 
+        To better understand what this method needs to do, see how the 
         `gym.ActionWrapper` parent class is doing in `gym.core`:
         
         Implement something here that performs the following mapping:
         DiscretizedObservationWrapper.action_space --> DiscretizedActionWrapper.action_space
-
-        Example
-        -------
-        For action_wrapper = 37 (follows the example of `_get_indices` above):
-
-        indices = [2, 1, 1]
-        Map indices to action values:
-        bins[2] from [0, 1, 2, 3] -> 2
-        bins[1] from [10, 11, 12, 13] -> 11
-        bins[1] from [20, 21, 22, 23] -> 21
-        Convert to NumPy array: np.asarray([2, 11, 21])
-        Return action: [2, 11, 21]
+        
         '''
-        indices = self._get_indices(action_wrapper)
+        
+     #   if isinstance(action_wrapper, list):
+        
+          #  self.val_bins_act = self.val_bins_act * len(action_wrapper)
+        
+        
         # Get the action values from bin indexes
-        action = [bins[x]
-                  for x, bins in zip(indices, 
-                                     self.val_bins_act)]
+        action = [bins[x] for x, bins in zip(action_wrapper.flatten(), self.val_bins_act)]
+        #action = [bins[x] for x, bins in zip(np.array(action_wrapper).flatten(), self.val_bins_act)]
 
         action = np.asarray(action).astype(self.env.action_space.dtype)
         
-        return action
-      
+        return action   #example: array([0.], dtype=float32)
+'''
+temp = np.array([np.int32(2), np.int32(5)])        
+temp2 = [[10,20,30,40,50], [60,70,80,90,100,110]]
+for x, bins in zip(temp.flatten(), temp2):
+     print(x, "  ", bins, "  ",bins[x])
+'''
 class NormalizedObservationWrapper(gym.ObservationWrapper):
     '''This wrapper normalizes the values of the observation space to lie
     between -1 and 1. Normalization can significantly help with convergence
@@ -1193,8 +1188,7 @@ class NormalizedObservationWrapper(gym.ObservationWrapper):
         '''
         
         # Convert to one number for the wrapped environment
-        observation_wrapper = 2*(observation - self.observation_space.low)/\
-            (self.observation_space.high-self.observation_space.low)-1
+        observation_wrapper = 2*(observation - self.observation_space.low) / (self.observation_space.high-self.observation_space.low)-1
         
         return observation_wrapper
      
@@ -1286,7 +1280,7 @@ class BoptestGymEnvRewardClipping(BoptestGymEnv):
         '''
         
         # Compute BOPTEST core kpis
-        kpis = requests.get('{0}/kpi/{1}'.format(self.url, self.testid)).json()['payload']
+        kpis = requests.get('{0}/kpi'.format(self.url)).json()['payload']
         
         # Calculate objective integrand function at this point
         objective_integrand = kpis['cost_tot'] + kpis['tdis_tot']
@@ -1323,7 +1317,7 @@ class BoptestGymEnvRewardWeightCost(BoptestGymEnv):
         w = 0.1
         
         # Compute BOPTEST core kpis
-        kpis = requests.get('{0}/kpi/{1}'.format(self.url, self.testid)).json()['payload']
+        kpis = requests.get('{0}/kpi'.format(self.url)).json()['payload']
         
         # Calculate objective integrand function at this point
         objective_integrand = kpis['cost_tot'] + w*kpis['tdis_tot']
@@ -1357,7 +1351,7 @@ class BoptestGymEnvRewardWeightDiscomfort(BoptestGymEnv):
         w = 10
         
         # Compute BOPTEST core kpis
-        kpis = requests.get('{0}/kpi/{1}'.format(self.url, self.testid)).json()['payload']
+        kpis = requests.get('{0}/kpi'.format(self.url)).json()['payload']
         
         # Calculate objective integrand function at this point
         objective_integrand = kpis['cost_tot'] + w*kpis['tdis_tot']
@@ -1367,7 +1361,7 @@ class BoptestGymEnvRewardWeightDiscomfort(BoptestGymEnv):
         
         self.objective_integrand = objective_integrand
         
-        return reward
+        return reward #was reward
     
 class BoptestGymEnvVariableEpisodeLength(BoptestGymEnv):
     '''Boptest gym environment that redefines the reward function to 
@@ -1397,7 +1391,7 @@ class BoptestGymEnvVariableEpisodeLength(BoptestGymEnv):
                      (self.objective_integrand >= objective_integrand_threshold)
         
         return truncated
-
+"""
 class SaveAndTestCallback(BaseCallback):
     '''
     Callback for saving a model (the check is done every `check_freq` 
@@ -1505,7 +1499,7 @@ class SaveAndTestCallback(BaseCallback):
                 self.env.reset() 
         
         return True
-
+"""
 if __name__ == "__main__":
     
     # Instantiate the env    
@@ -1514,7 +1508,7 @@ if __name__ == "__main__":
     # Check the environment
     check_env(env, warn=True)
     obs, _ = env.reset()
-    env.render()
+    #env.render()
     print('Observation space: {}'.format(env.observation_space))
     print('Action space: {}'.format(env.action_space))
     

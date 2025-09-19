@@ -8,7 +8,11 @@ Created on Wed Nov 20 18:38:10 2024
 
 import os
 import sys
-sys.path.append("C:/Users/gauthambekal93/Research/hvac_continual_rl/common/codes")
+#sys.path.append("C:/Users/gauthambekal93/Research/hvac_continual_rl/common/codes")
+sys.path.append("C:/Users/ahmed/Documents/GitHub/hvac_continual_rl/common/codes")
+
+
+
 import torch
 import numpy as np
 import pandas as pd
