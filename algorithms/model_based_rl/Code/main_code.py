@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
 
     """Initialize and load the env model and memory """
-    realT_zon_model, dry_bulb_model, reward_model, env_memory_train = initialize_env_model(env, learnt_env_attributes)
+    realT_zon_model, dry_bulb_model, reward_model, env_memory_train = initialize_env_model(env, learnt_env_attributes, device)
 
     realT_zon_model, dry_bulb_model, reward_model, env_memory_train, completed_initial_env_train =  load_env_model(realT_zon_model, dry_bulb_model, reward_model, env_memory_train, learnt_env_attributes)
 
@@ -143,7 +143,7 @@ if __name__ == '__main__':
                 
                 next_state, reward, done = collect_from_actual_env( env, discrete_action )  
                 
-                agent_actual_memory.remember( state, action, discrete_action, reward, next_state, done)
+                agent_actual_memory.remember( state, action, discrete_action, reward, next_state, done, device)
             
                 env_memory_train.remember(agent_actual_memory) 
                 
@@ -157,9 +157,9 @@ if __name__ == '__main__':
                 
                 if (len(env_memory_train.states_train) >0) and (len(env_memory_train.states_validation) >0):    
                     
-                    reward_model, reward_model_loss  = train_neuralnet(reward_model, env_memory_train, learnt_env_attributes) 
+                    reward_model, reward_model_loss  = train_neuralnet(reward_model, env_memory_train, learnt_env_attributes, device) 
                         
-                    realT_zon_model, zone_temp_loss  = train_neuralnet(realT_zon_model, env_memory_train, learnt_env_attributes ) 
+                    realT_zon_model, zone_temp_loss  = train_neuralnet(realT_zon_model, env_memory_train, learnt_env_attributes, device) 
                     
                 
                 if time_step % 100 == 0:  
@@ -171,7 +171,7 @@ if __name__ == '__main__':
                     
                 if env_memory_train.memory_size() > 10:
                 
-                    create_synthetic_data( actor, realT_zon_model, dry_bulb_model, reward_model, agent_actual_memory, agent_synthetic_memory, real_env_attributes, agent_attributes, learnt_env_attributes, env )
+                    create_synthetic_data( actor, realT_zon_model, dry_bulb_model, reward_model, agent_actual_memory, agent_synthetic_memory, real_env_attributes, agent_attributes, learnt_env_attributes, env, device )
                 
                 if True:
                     
@@ -201,11 +201,11 @@ if __name__ == '__main__':
             train_time = train_time + ( time.time() - start_time)                
             
             
-            #save_train_results(i_episode, train_time, episode_rewards, plot_scores_train, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, real_env_attributes, agent_attributes , env )
+            save_train_results(i_episode, train_time, episode_rewards, plot_scores_train, episode_actor_loss, episode_critic_1_loss, episode_critic_2_loss, q_predictions, real_env_attributes, agent_attributes , env )
             
-            #save_test_results(i_episode, env, real_env_attributes, agent_attributes , actor)
+            save_test_results(i_episode, env, real_env_attributes, agent_attributes , actor)
     
-            #save_models(i_episode, actor, actor_optimizer, critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory, agent_attributes, learnt_env_attributes, realT_zon_model, reward_model)
+            save_models(i_episode, actor, actor_optimizer, critic_1, critic_optimizer_1 , critic_2 , critic_optimizer_2, agent_actual_memory, agent_attributes, learnt_env_attributes, realT_zon_model, reward_model)
     
     
     

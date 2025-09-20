@@ -34,17 +34,17 @@ import pickle
 
 
 
-def initialize_env_model(env, learnt_env_attributes):     
+def initialize_env_model(env, learnt_env_attributes, device):     
      
      train_buffer_size = learnt_env_attributes["train_buffer_size"]
      
      train_test_ratio = learnt_env_attributes["train_test_ratio"]
     
-     realT_zon_model = ReaTZon_Model(env, learnt_env_attributes)
+     realT_zon_model = ReaTZon_Model(env, learnt_env_attributes, device)
     
-     dry_bulb_model = TDryBul_Model(env, learnt_env_attributes)
+     dry_bulb_model = TDryBul_Model(env, learnt_env_attributes, device)
      
-     reward_model = Reward_Model(env, learnt_env_attributes)
+     reward_model = Reward_Model(env, learnt_env_attributes, device)
      
      env_memory_train = Environment_Memory_Train(train_buffer_size,  train_test_ratio )
      
@@ -121,15 +121,15 @@ def load_env_model(realT_zon_model, dry_bulb_model, reward_model, env_memory_tra
 
 
 
-def calculate_train_loss( hypernet, y_pred, y, task_index):
+def calculate_train_loss( hypernet, y_pred, y, task_index, device):
     
     beta, regularizer = 0.01, 0.0   
     
-    weights, bias = hypernet.generate_weights_bias( task_index)
+    weights, bias = hypernet.generate_weights_bias( task_index, device)
     
     for previous_task_index in range(0, task_index): 
         
-        weights_old, bias_old = hypernet.generate_weights_bias( previous_task_index)
+        weights_old, bias_old = hypernet.generate_weights_bias( previous_task_index, device)
         
         for layer_no in range(len( weights )):
                 
@@ -143,10 +143,10 @@ def calculate_train_loss( hypernet, y_pred, y, task_index):
     
        
    
-def validate_model(hypernet, target_model, validation_X, validation_y, task_index, no_of_models):
+def validate_model(hypernet, target_model, validation_X, validation_y, task_index, no_of_models, device):
     
     with torch.no_grad():
-        weights, bias = hypernet.generate_weights_bias(task_index , no_of_models)
+        weights, bias = hypernet.generate_weights_bias(task_index , device, no_of_models )
     
         target_model.update_params( weights , bias, no_of_models )
     
@@ -163,7 +163,7 @@ def validate_model(hypernet, target_model, validation_X, validation_y, task_inde
   
 
 
-def train_neuralnet(model, env_memory, learnt_env_attributes ):
+def train_neuralnet(model, env_memory, learnt_env_attributes, device ):
     
     task_index = learnt_env_attributes["task_index"]
     
@@ -200,7 +200,7 @@ def train_neuralnet(model, env_memory, learnt_env_attributes ):
         
         batch_X , batch_y = train_X[index], train_y[index]
     
-        weights, bias = model.hypernet.generate_weights_bias(task_index, no_of_models )
+        weights, bias = model.hypernet.generate_weights_bias(task_index, device, no_of_models )
         
         model.target_model.update_params(weights, bias, no_of_models )
         
@@ -208,7 +208,7 @@ def train_neuralnet(model, env_memory, learnt_env_attributes ):
             
         predictions = torch.mean(predictions, dim =0)
         
-        loss = calculate_train_loss( model.hypernet , predictions, batch_y, task_index )
+        loss = calculate_train_loss( model.hypernet , predictions, batch_y, task_index, device )
         
         model.hypernet_optimizer.zero_grad()
         
@@ -223,7 +223,7 @@ def train_neuralnet(model, env_memory, learnt_env_attributes ):
         end = end + batch_size         
     
            
-    validation_loss, validation_predictions = validate_model( model.hypernet, model.target_model, validation_X, validation_y, task_index , no_of_models)
+    validation_loss, validation_predictions = validate_model( model.hypernet, model.target_model, validation_X, validation_y, task_index , no_of_models, device)
              
     #print("Model: " ,model.name, "Hypernet Validation Loss: ", validation_loss)
     

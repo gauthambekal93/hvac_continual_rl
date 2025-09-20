@@ -27,23 +27,23 @@ class Agent_Memory:
         
                                  
         
-    def remember(self, state, action, discrete_action, reward, next_state, done ):
+    def remember(self, state, action, discrete_action, reward, next_state, done , device):
         
-        self.states.append(  torch.tensor( state ).reshape(1,-1) )
+        self.states.append(  torch.tensor( state ).to(device).reshape(1,-1) )
         
-        temp =  torch.tensor( np.where(discrete_action == 0, -1 , 1) )  
+        temp =  torch.tensor( np.where(discrete_action == 0, -1 , 1) ).to(device)  
         
         action = action.detach().clone() 
     
         self.actions.append( torch.cat( [action, temp, temp ], dim = 1)   )
         
-        self.discrete_actions.append( torch.tensor(discrete_action).reshape(1,-1) )
+        self.discrete_actions.append( torch.tensor(discrete_action).to(device).reshape(1,-1) )
         
-        self.rewards.append(torch.tensor(reward).reshape(1,-1))
+        self.rewards.append(torch.tensor(reward).to(device).reshape(1,-1))
         
-        self.next_states.append(torch.tensor(next_state ).reshape(1,-1) )
+        self.next_states.append(torch.tensor(next_state ).to(device).reshape(1,-1) )
         
-        self.done.append(torch.tensor(done).reshape(1,-1))
+        self.done.append(torch.tensor(done).to(device).reshape(1,-1))
        
         
     def sample_memory(self,  sample_size = 64 , last_element = False ):  

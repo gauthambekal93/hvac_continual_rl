@@ -24,7 +24,7 @@ class Target():
         
         self.weight2_shape =   (hidden_dim, hidden_dim)
         
-        self.bias2_shape =     (1, hidden_dim) 
+        self.bias2_shape =     (1, hidden_dim)
         
         self.weight3_shape =   (hidden_dim, output_dim )
         
@@ -121,7 +121,7 @@ class Hypernet(nn.Module):
            return w_logits, b_logits
         
 
-    def generate_weights_bias(self, task_index, no_of_models  =  1):
+    def generate_weights_bias(self, task_index, device, no_of_models  =  1):
 
         task_id =  torch.nn.functional.one_hot( torch.tensor(task_index) , num_classes = self.num_tasks).float() 
         
@@ -134,7 +134,7 @@ class Hypernet(nn.Module):
             
             layer_id = torch.nn.functional.one_hot( torch.tensor(i) , num_classes = self.num_layers) .repeat(no_of_models, 1)
             
-            X = torch.cat( [ task_id, layer_id ] , dim = 1).to(dtype=torch.float32)
+            X = torch.cat( [ task_id, layer_id ] , dim = 1).to(device).to(dtype=torch.float32)
             
             if X.dim() ==1: 
                 X = X.reshape(1,-1)
@@ -153,7 +153,7 @@ class Hypernet(nn.Module):
 
 class ReaTZon_Model:
     
-    def __init__(self, env, learnt_env_attributes):
+    def __init__(self, env, learnt_env_attributes, device):
         
         self.name = "ReaTZon_Model"
         
@@ -190,7 +190,7 @@ class ReaTZon_Model:
         h_hidden_dim = max(w1_dim, w2_dim, w3_dim)
         
         
-        self.hypernet = Hypernet(  h_input_dim, h_hidden_dim, w1_dim, b1_dim, w2_dim, b2_dim, w3_dim, b3_dim, num_tasks, num_layers ) 
+        self.hypernet = Hypernet(  h_input_dim, h_hidden_dim, w1_dim, b1_dim, w2_dim, b2_dim, w3_dim, b3_dim, num_tasks, num_layers ).to(device) 
         
         self.hypernet_optimizer =  optim.Adam( self.hypernet.parameters(), lr =  learnt_env_attributes["lr"] ) 
         
@@ -231,7 +231,7 @@ class ReaTZon_Model:
 
 class TDryBul_Model:
     
-    def __init__(self, env, learnt_env_attributes):
+    def __init__(self, env, learnt_env_attributes, device):
         
         self.name = "TDryBul_Model"
         
@@ -267,7 +267,7 @@ class TDryBul_Model:
 
         h_hidden_dim = max(w1_dim, w2_dim, w3_dim)
         
-        self.hypernet = Hypernet(  h_input_dim, h_hidden_dim, w1_dim, b1_dim, w2_dim, b2_dim, w3_dim, b3_dim, num_tasks, num_layers ) 
+        self.hypernet = Hypernet(  h_input_dim, h_hidden_dim, w1_dim, b1_dim, w2_dim, b2_dim, w3_dim, b3_dim, num_tasks, num_layers ).to(device) 
         
         self.hypernet_optimizer = optim.Adam( self.hypernet.parameters(), lr =  learnt_env_attributes["lr"] )
 
@@ -293,7 +293,7 @@ class TDryBul_Model:
         
     
 class Reward_Model:
-    def __init__(self, env, learnt_env_attributes):
+    def __init__(self, env, learnt_env_attributes, device):
         
         self.name = "Reward_Model"
         
@@ -330,7 +330,7 @@ class Reward_Model:
 
         h_hidden_dim = max(w1_dim, w2_dim, w3_dim)
         
-        self.hypernet =  Hypernet(  h_input_dim, h_hidden_dim, w1_dim, b1_dim, w2_dim, b2_dim, w3_dim, b3_dim, num_tasks, num_layers )
+        self.hypernet =  Hypernet(  h_input_dim, h_hidden_dim, w1_dim, b1_dim, w2_dim, b2_dim, w3_dim, b3_dim, num_tasks, num_layers ).to(device)
         
         self.hypernet_optimizer = optim.Adam(  self.hypernet.parameters(), lr =  learnt_env_attributes["lr"] ) 
          
