@@ -1,20 +1,9 @@
-model_based_rl/stage_1_action_heat/Models/*
-model_based_rl/stage_2_actions_heat_fan_cool/Models/*
-model_based_rl/stage_3_action_heat/Models/*
-
-model_free_rl/stage_1_action_heat/Models/*
-model_free_rl/stage_2_actions_heat_fan_cool/Models/*
+#Below gitignore is for older experiments
+model_based_rl/
+model_free_rl/
 
 
-!model_based_rl/stage_1_action_heat/Models/README.txt
-!model_based_rl/stage_2_actions_heat_fan_cool/Models/README.txt
-!model_based_rl/stage_3_action_heat/Models/README.txt
-
-!model_free_rl/stage_1_action_heat/Models/README.txt
-!model_free_rl/stage_2_actions_heat_fan_cool/Models/README.txt
-
-
-
+#Below is git ignore for task 1
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/0/individual_train_results/
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/0/individual_test_results/
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/0/Models/rl_models/*.pkl
@@ -44,3 +33,12 @@ results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/individual_t
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/individual_test_results/
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/Models/rl_models/*.pkl
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/Models/env_models/.*pkl
+
+
+
+
+#Below is git ignore for task 2
+results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/individual_train_results/
+results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/individual_test_results/
+results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/Models/rl_models/*.pkl
+results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/Models/env_models/.*pkl
