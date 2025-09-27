@@ -1,0 +1,44 @@
+#Below gitignore is for older experiments
+model_based_rl/
+model_free_rl/
+
+
+#Below is git ignore for task 1
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/0/individual_train_results/
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/0/individual_test_results/
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/0/Models/rl_models/*.pkl
+
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/1/individual_train_results/
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/1/individual_test_results/
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/1/Models/rl_models/*.pkl
+
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/2/individual_train_results/
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/2/individual_test_results/
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/2/Models/rl_models/*.pkl
+
+
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/0/individual_train_results/
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/0/individual_test_results/
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/0/Models/rl_models/*.pkl
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/0/Models/env_models/.*pkl
+
+
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/1/individual_train_results/
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/1/individual_test_results/
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/1/Models/rl_models/*.pkl
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/1/Models/env_models/.*pkl
+
+
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/individual_train_results/
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/individual_test_results/
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/Models/rl_models/*.pkl
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/Models/env_models/.*pkl
+
+
+
+
+#Below is git ignore for task 2
+results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/individual_train_results/
+results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/individual_test_results/
+results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/Models/rl_models/*.pkl
+results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/Models/env_models/.*pkl

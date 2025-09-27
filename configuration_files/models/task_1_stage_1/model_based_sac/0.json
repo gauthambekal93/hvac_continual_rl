@@ -1,0 +1,57 @@
+{  
+  
+  "rl_agent":  
+   
+  { 
+  
+     "seed": 20,
+     "algorithm_type": "model_based_sac", 
+     "n_training_episodes": 500,
+     "hidden_size": 100, 
+     "gamma":0.99,
+     "actor_lr": 0.00005,    
+     "critic_lr": 0.0002,
+     "rho":0.99,
+     "alpha": 0.15,
+     "real_buffer_size": 35000,
+     "synthetic_buffer_size": 350000,
+     "multiplicative_factor": 1,
+     "batch_size": 1024, 
+     "no_of_updates": 2,
+     "metrics_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_based_sac/0/metrics.csv",
+     "exp_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_based_sac/0",
+     "model_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_based_sac/0/Models/rl_models/",
+     "individual_train_results":"C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_based_sac/0/individual_train_results/",
+     "individual_test_results":"C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_based_sac/0/individual_test_results/",
+     "consolidated_results":"C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_based_sac/0/consolidated_results/",
+     "save_to_file": "True",
+     "plot": "True"
+
+  },
+
+  "learnt_world_model": 
+  {
+     "num_tasks": 3,
+     "real_zone_input": 13,
+     "dry_bulb_input": 9,
+     "reward_model_input": 6,
+     "real_zone_output": 1,
+     "dry_bulb_output": 1 , 
+     "reward_model_output": 1,
+     "lr": 0.0001,  
+     "task_index": 0,
+     "epochs": 301,
+     "hypernet_old": null,
+     "train_buffer_size": 4000,
+     "batch_size":20,
+     "no_of_updates":5,
+     "train_test_ratio": 0.80,
+     "no_of_synthetic_samples": 10, 
+     "hidden_size": 32,
+     "num_layers": 3,
+     "no_of_models": 100,
+     "model_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_based_sac/0/Models/env_models/"
+}
+
+}
+
