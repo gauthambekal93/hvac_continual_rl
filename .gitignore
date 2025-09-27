@@ -1,6 +1,6 @@
 #Below gitignore is for older experiments
-model_based_rl/
-model_free_rl/
+model_based_rl_old/
+model_free_rl_old/
 
 
 #Below is git ignore for task 1
