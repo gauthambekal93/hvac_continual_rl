@@ -184,6 +184,9 @@ def bestest_hydronic_heat_pump(data_params, model_params):
                         "consolidated_results":  model_params["rl_agent"]["consolidated_results"],
                         "save_to_file": True if model_params["rl_agent"]["save_to_file"]=="True" else False,
                         "plot": True if model_params["rl_agent"]["plot"]=="True" else False,
+                        "exp_name": model_params["exp_name"] ,
+                        "train_from_scratch": True if model_params["rl_agent"]["train_from_scratch"]=="True" else False,
+                        "previous_model_path": model_params["rl_agent"]["previous_model_path"]
 
         }
     
@@ -213,6 +216,10 @@ def bestest_hydronic_heat_pump(data_params, model_params):
                         "num_layers": model_params["learnt_world_model"]["num_layers"]    ,
                         "no_of_models": model_params["learnt_world_model"]["no_of_models"],
                         "model_path":  model_params["learnt_world_model"]["model_path"],
+                        "exp_name": model_params["exp_name"] ,
+                        "train_from_scratch": True if model_params["learnt_world_model"]["train_from_scratch"]=="True" else False,
+                        "previous_model_path_1": model_params["learnt_world_model"]["previous_model_path_1"],
+                        "previous_model_path_2": model_params["learnt_world_model"]["previous_model_path_2"]
                         }
     
     

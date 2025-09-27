@@ -63,15 +63,17 @@ class Actor(nn.Module):
         return sampled_actions
     
     def get_action_log_probs(self, actions, mu, std):
-       
-        normal_dist = Normal(mu, std)
-        
-        adjustment = torch.sum( torch.log( 1 - self.tanh(actions)**2  + 1e-6 ) , dim = 1)
-        
-        action_log_probs = torch.sum( normal_dist.log_prob(actions), dim =1 ) - adjustment
-        
-        return action_log_probs.reshape(-1, 1)   #we reshape it because for action_log_probs we always want second dimenssion to be 1
-    
+        try:
+            normal_dist = Normal(mu, std)
+            
+            adjustment = torch.sum( torch.log( 1 - self.tanh(actions)**2  + 1e-6 ) , dim = 1)
+            
+            action_log_probs = torch.sum( normal_dist.log_prob(actions), dim =1 ) - adjustment
+            
+            return action_log_probs.reshape(-1, 1)   #we reshape it because for action_log_probs we always want second dimenssion to be 1
+        except:
+            print("stop")
+            print("stop")
     def discretize_action(self, continuous_actions):
         # Map each continuous action value to the closest bin
         discrete_actions = np.digitize(continuous_actions.detach().cpu().numpy(), self.bins) - 1

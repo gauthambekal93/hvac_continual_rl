@@ -59,7 +59,7 @@ def load_env_model(realT_zon_model, dry_bulb_model, reward_model, env_memory_tra
     
     temp1, temp2, temp3 = False, False, False
     
-    model_files = [f for f in os.listdir(model_path ) if ('Task_No_{0}_hypernet_{1}'.format(task_index, realT_zon_model.name) in f) and f.endswith('.pkl')]
+    model_files = [f for f in os.listdir(model_path ) if ( "realT_zon_model_{0}_.pkl".format(task_index) in f)]
     
     if model_files:
         
@@ -71,7 +71,7 @@ def load_env_model(realT_zon_model, dry_bulb_model, reward_model, env_memory_tra
         
         realT_zon_model.initial_training = True
         
-        realT_zon_model.current_loss = checkpoint["current_loss"]
+        #realT_zon_model.current_loss = checkpoint["current_loss"]
         
         temp1 = True
         
@@ -87,12 +87,13 @@ def load_env_model(realT_zon_model, dry_bulb_model, reward_model, env_memory_tra
          
          dry_bulb_model.initial_training = True
          
-         dry_bulb_model.current_loss = checkpoint["current_loss"]
+         #dry_bulb_model.current_loss = checkpoint["current_loss"]
          
          temp2 = True
          
-    model_files = [f for f in os.listdir(model_path ) if ('Task_No_{0}_hypernet_{1}'.format(task_index, reward_model.name) in f) and f.endswith('.pkl')]
-     
+    #model_files = [f for f in os.listdir(model_path ) if ('Task_No_{0}_hypernet_{1}'.format(task_index, reward_model.name) in f) and f.endswith('.pkl')]
+    model_files = [f for f in os.listdir(model_path ) if ( "reward_model_{0}_.pkl".format(task_index) in f)] 
+    
     if model_files:
           
           checkpoint = torch.load(model_path + model_files[0])
@@ -103,7 +104,7 @@ def load_env_model(realT_zon_model, dry_bulb_model, reward_model, env_memory_tra
          
           reward_model.initial_training = True   
           
-          reward_model.current_loss = checkpoint["current_loss"]
+          #reward_model.current_loss = checkpoint["current_loss"]
           
           temp3 = True
           
