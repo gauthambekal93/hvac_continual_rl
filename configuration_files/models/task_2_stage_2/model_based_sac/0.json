@@ -17,7 +17,7 @@
      "synthetic_buffer_size": 350000,
      "multiplicative_factor": 1,
      "batch_size": 1024, 
-     "no_of_updates": 2,
+     "no_of_updates": 4,
      "metrics_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/metrics.csv",
      "exp_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0",
      "save_model_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/Models/rl_models/",
