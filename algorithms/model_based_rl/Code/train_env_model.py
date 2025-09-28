@@ -143,8 +143,6 @@ def train_neuralnet(model, env_memory, learnt_env_attributes, device ):
     
     no_of_updates = learnt_env_attributes["no_of_updates"]
     
-    model_path = learnt_env_attributes["model_path"]
-    
     train_X, train_y, validation_X, validation_y = model.get_dataset(env_memory)
     
     task_index = task_index

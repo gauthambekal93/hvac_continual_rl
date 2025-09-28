@@ -17,19 +17,19 @@ results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/2/Models/rl_mod
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/0/individual_train_results/Train_*
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/0/individual_test_results/Test_*
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/0/Models/rl_models/*.pkl
-results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/0/Models/env_models/.*pkl
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/0/Models/env_models/*.pkl
 
 
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/1/individual_train_results/Train_*
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/1/individual_test_results/Test_*
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/1/Models/rl_models/*.pkl
-results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/1/Models/env_models/.*pkl
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/1/Models/env_models/*.pkl
 
 
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/individual_train_results/Train_*
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/individual_test_results/Test_*
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/Models/rl_models/*.pkl
-results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/Models/env_models/.*pkl
+results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/Models/env_models/*.pkl
 
 
 
@@ -38,4 +38,4 @@ results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/Models/env_m
 results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/individual_train_results/Train_*
 results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/individual_test_results/Test_*
 results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/Models/rl_models/*.pkl
-results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/Models/env_models/.*pkl
+results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/Models/env_models/*.pkl
