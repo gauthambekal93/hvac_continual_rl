@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Fri Sep 26 16:03:38 2025
+
+@author: gauthambekal93
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Wed Nov 20 18:38:10 2024
 
 @author: gauthambekal93
@@ -60,9 +67,9 @@ if __name__ == '__main__':
     
     project_root = os.path.abspath( os.path.join(os.getcwd(), "..","..", ".."))
      
-    data_config_path = os.path.join(project_root, "configuration_files","data", "task_1","stage_1_action_heat.json") 
+    data_config_path = os.path.join(project_root, "configuration_files","data", "task_2_stage_2","action_heat_fan_cool.json") 
     
-    model_config_path = os.path.join(project_root, "configuration_files","models", "task_1", "model_based_sac", "2.json") 
+    model_config_path = os.path.join(project_root, "configuration_files","models", "task_2_stage_2", "model_based_sac", "0.json") 
     
     data_params, model_params = get_configurations(data_config_path, model_config_path)
 
@@ -91,14 +98,15 @@ if __name__ == '__main__':
     """Initialize and load the RL model and memory """
     actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, agent_synthetic_memory = initialize_agent(real_env_attributes, agent_attributes)
 
-     #we donot load agent_synthetic_memory, since it can be populated using agent_synthetic_memory and models
-    #actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, agent_synthetic_memory, last_loaded_episode = load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, agent_synthetic_memory, env_attributes)
+    if agent_attributes["resume_from_episode"] >0:   
+        actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, agent_synthetic_memory, last_loaded_episode = load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, agent_synthetic_memory)
 
 
     """Initialize and load the env model and memory """
     realT_zon_model, dry_bulb_model, reward_model, env_memory_train = initialize_env_model(env, learnt_env_attributes, device)
-
-    realT_zon_model, dry_bulb_model, reward_model, env_memory_train, completed_initial_env_train =  load_env_model(realT_zon_model, dry_bulb_model, reward_model, env_memory_train, learnt_env_attributes)
+    
+    if learnt_env_attributes["resume_from_episode"] >0:  
+        realT_zon_model, dry_bulb_model, reward_model, env_memory_train =  load_env_model(realT_zon_model, dry_bulb_model, reward_model, env_memory_train, learnt_env_attributes)
 
     
     if last_loaded_episode !=0:  

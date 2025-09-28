@@ -1,7 +1,4 @@
 #Below gitignore is for older experiments
-model_based_rl_old/
-model_free_rl_old/
-
 
 #Below is git ignore for task 1
 results/boptest_hydronic_heat_pump/task_1_stage_1/model_free_sac/0/individual_train_results/
