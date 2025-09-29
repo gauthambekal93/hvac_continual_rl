@@ -51,7 +51,7 @@ def create_synthetic_data( actor, realT_zon_model, dry_bulb_model, reward_model,
           
           actions = torch.cat( [ actions, torch.tensor(temp).to(device) , torch.tensor(temp).to(device) ], axis = 1  )
       
-      if ('task_1_stage_1' == exp_name ) or ('task_2_stage_2' == exp_name) :
+      if ('task_1_stage_1' != exp_name ) and ('task_2_stage_2' != exp_name) :
     
           raise Exception("Experiment name has been incorrectly given")
       
