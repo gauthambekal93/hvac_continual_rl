@@ -27,7 +27,7 @@ class Agent_Memory:
         
                                  
         
-    def remember(self, state, action, discrete_action, reward, next_state, done , device):
+    def remember(self, state, action, discrete_action, reward, next_state, done , device, exp_name):
         
         self.states.append(  torch.tensor( state ).to(device).reshape(1,-1) )
         
@@ -35,8 +35,14 @@ class Agent_Memory:
         
         action = action.detach().clone() 
     
-        self.actions.append( torch.cat( [action, temp, temp ], dim = 1)   )
+        if 'task_1_stage_1' == exp_name:
+            self.actions.append( torch.cat( [action, temp, temp ], dim = 1)   )
         
+        elif 'task_2_stage_2' == exp_name:
+            self.actions.append(  action   )
+        else:
+            raise Exception("Experiment name has been incorrectly given")
+            
         self.discrete_actions.append( torch.tensor(discrete_action).to(device).reshape(1,-1) )
         
         self.rewards.append(torch.tensor(reward).to(device).reshape(1,-1))

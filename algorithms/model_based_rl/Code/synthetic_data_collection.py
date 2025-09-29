@@ -28,7 +28,7 @@ def generate_test_predictions(validation_X, hypernet, target_model, task_index, 
 
 
 
-def create_synthetic_data( actor, realT_zon_model, dry_bulb_model, reward_model, agent_actual_memory, agent_synthetic_memory, real_env_attributes, agent_attributes, learnt_env_attributes, env, device ):
+def create_synthetic_data( actor, realT_zon_model, dry_bulb_model, reward_model, agent_actual_memory, agent_synthetic_memory, real_env_attributes, agent_attributes, learnt_env_attributes, env, device, exp_name ):
 
       
       task_index = learnt_env_attributes["task_index"]
@@ -42,14 +42,18 @@ def create_synthetic_data( actor, realT_zon_model, dry_bulb_model, reward_model,
       
       
       actions, discrete_actions, _ = actor.select_action( state_samples[ :,   agent_attributes["state_mask"] ]  )
-      
+     
       actions = actions.detach().clone()
       
-      temp =  np.where(discrete_actions == 0, -1 , 1)  #was 0 instead of -1 
+      if 'task_1_stage_1' == exp_name:
+          
+          temp =  np.where(discrete_actions == 0, -1 , 1)  #was 0 instead of -1 
+          
+          actions = torch.cat( [ actions, torch.tensor(temp).to(device) , torch.tensor(temp).to(device) ], axis = 1  )
       
-      actions = torch.cat( [ actions, torch.tensor(temp).to(device) , torch.tensor(temp).to(device) ], axis = 1  )
-      
-      
+      if ('task_1_stage_1' == exp_name ) or ('task_2_stage_2' == exp_name) :
+    
+          raise Exception("Experiment name has been incorrectly given")
       
       """ Predict the Zone operative temperature"""
       test_X =  torch.cat([ state_samples[:, realT_zon_model.input_state_index ], actions ] , dim = 1 )

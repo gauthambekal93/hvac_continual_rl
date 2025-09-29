@@ -67,15 +67,17 @@ if __name__ == '__main__':
     
     project_root = os.path.abspath( os.path.join(os.getcwd(), "..","..", ".."))
      
-    data_config_path = os.path.join(project_root, "configuration_files","data", "task_1_stage_1","action_heat.json") 
+    data_config_path = os.path.join(project_root, "configuration_files","data", "task_2_stage_2","action_heat_fan_cool.json") 
     
-    model_config_path = os.path.join(project_root, "configuration_files","models", "task_1_stage_1", "model_based_sac", "0.json") 
+    model_config_path = os.path.join(project_root, "configuration_files","models", "task_2_stage_2", "model_based_sac", "0.json") 
     
     data_params, model_params = get_configurations(data_config_path, model_config_path)
 
     env,  real_env_attributes, agent_attributes , learnt_env_attributes = bestest_hydronic_heat_pump( data_params, model_params)
      
     set_seed(model_params["rl_agent"]["seed"])
+    
+    exp_name = agent_attributes["exp_name"]
     
     n_training_episodes = agent_attributes['n_training_episodes'] 
 
@@ -151,7 +153,7 @@ if __name__ == '__main__':
                 
                 next_state, reward, done = collect_from_actual_env( env, discrete_action )  
                 
-                agent_actual_memory.remember( state, action, discrete_action, reward, next_state, done, device)
+                agent_actual_memory.remember( state, action, discrete_action, reward, next_state, done, device, exp_name)
             
                 env_memory_train.remember(agent_actual_memory) 
                 
@@ -179,7 +181,7 @@ if __name__ == '__main__':
                     
                 if env_memory_train.memory_size() > 10:
                 
-                    create_synthetic_data( actor, realT_zon_model, dry_bulb_model, reward_model, agent_actual_memory, agent_synthetic_memory, real_env_attributes, agent_attributes, learnt_env_attributes, env, device )
+                    create_synthetic_data( actor, realT_zon_model, dry_bulb_model, reward_model, agent_actual_memory, agent_synthetic_memory, real_env_attributes, agent_attributes, learnt_env_attributes, env, device, exp_name )
                 
                 if True:
                     
