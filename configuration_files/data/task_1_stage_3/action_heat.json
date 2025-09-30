@@ -1,0 +1,50 @@
+{ 
+  "env_type":"bestest_hydronic_heat_pump",
+
+  "urls": {
+    "base_url": "http://127.0.0.1:5000",
+    "operational_data": "http://127.0.0.1:5000/initialize"
+  },
+
+  "time_params": {
+    "warmup_period": 86400,
+    "episode_length_test": 1209600,
+    "warmup_period_test": 604800,
+    "start_time_train": 5173160,
+    "start_time_tests": [1382400, 9331200],
+    "max_episode_length": 1209600,
+    "random_start_time": true,
+    "step_period": 900,
+    "render_episodes": false,
+    "predictive_period": 7200,
+    "regressive_period": null
+  },
+
+  "actions": ["oveHeaPumY_u"],
+
+  "points": [
+    "reaTZon_y",
+    "reaTSetHea_y",
+    "reaTSetCoo_y",
+    "oveHeaPumY_u",
+    "oveFan_u",
+    "ovePum_u",
+    "weaSta_reaWeaTDryBul_y",
+    "weaSta_reaWeaHDirNor_y"
+  ],
+
+  "observations": {
+    "time": [0, 604800],
+    "reaTZon_y": [280.0, 310.0],
+    "TDryBul": [265, 303],
+    "reaTSetCoo_y": [296, 303],
+    "reaTSetHea_y": [288, 295]
+  },
+
+  "excluded_states": ["reaTSetHea_y", "reaTSetCoo_y"],
+  "excluding_periods": [14947200 , 22982400],
+  "n_bins_act": 10,
+  "obs_dim": 13,
+  "action_mask": ["True", "False", "False"]
+ 
+}
