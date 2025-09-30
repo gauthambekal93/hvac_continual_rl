@@ -40,7 +40,7 @@
      "dry_bulb_output": 1 , 
      "reward_model_output": 1,
      "lr": 0.0001,  
-     "task_index": 1,
+     "task_index": 0,
      "epochs": 301,
      "hypernet_old": null,
      "train_buffer_size": 4000,

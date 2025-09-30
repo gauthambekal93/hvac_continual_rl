@@ -35,7 +35,7 @@ class Agent_Memory:
         
         action = action.detach().clone() 
     
-        if 'task_1_stage_1' == exp_name:
+        if ( 'task_1_stage_1' == exp_name ) or ('task_1_stage_3' == exp_name ) :
             self.actions.append( torch.cat( [action, temp, temp ], dim = 1)   )
         
         elif 'task_2_stage_2' == exp_name:
