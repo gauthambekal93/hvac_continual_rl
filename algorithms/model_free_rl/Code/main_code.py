@@ -54,9 +54,9 @@ if __name__ == '__main__':
     
     project_root = os.path.abspath( os.path.join(os.getcwd(), "..","..", ".."))
      
-    data_config_path = os.path.join(project_root, "configuration_files","data", "task_1_stage_1","action_heat.json") 
+    data_config_path = os.path.join(project_root, "configuration_files","data", "task_2_stage_2","action_heat_fan_cool.json") 
     
-    model_config_path = os.path.join(project_root, "configuration_files","models", "task_1_stage_1", "model_free_sac", "0.json") 
+    model_config_path = os.path.join(project_root, "configuration_files","models", "task_2_stage_2", "model_free_sac", "0.json") 
     
     data_params, model_params = get_configurations(data_config_path, model_config_path)
 
@@ -149,8 +149,6 @@ if __name__ == '__main__':
            
                 if True:        
     
-                    #was for _ in range(env_attributes["no_of_updates"]):
-                    
                     for _ in range(agent_attributes["no_of_updates"]):
                         
                         #was batch_states, batch_actions, batch_rewards, batch_next_states, batch_done = get_train_data( agent_actual_memory , env_attributes )
