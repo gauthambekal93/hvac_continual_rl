@@ -27,15 +27,23 @@ class Agent_Memory:
         
                                  
         
-    def remember(self, state, action, discrete_action, reward, next_state, done ):
+    def remember(self, state, action, discrete_action, reward, next_state, done , exp_name):
         
         self.states.append(  torch.tensor( state ). to(torch.device("cuda:0" if torch.cuda.is_available() else "cpu")). reshape(1,-1) )
         
         temp =  torch.tensor( np.where(discrete_action == 0, -1 , 1) ).to( torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))  
         
         action = action.detach().clone() 
-    
-        self.actions.append( torch.cat( [action, temp, temp ], dim = 1)   )
+        
+        if ( 'task_1_stage_1' == exp_name ) or ('task_1_stage_3' == exp_name ) :
+            self.actions.append( torch.cat( [action, temp, temp ], dim = 1)   )
+        
+        elif 'task_2_stage_2' == exp_name:
+            self.actions.append(  action   )
+        else:
+            raise Exception("Experiment name has been incorrectly given")
+            
+        #self.actions.append( torch.cat( [action, temp, temp ], dim = 1)   )
         
         self.discrete_actions.append( torch.tensor(discrete_action). to(torch.device("cuda:0" if torch.cuda.is_available() else "cpu")).reshape(1,-1) )
         
@@ -49,14 +57,12 @@ class Agent_Memory:
     def sample_memory(self,  sample_size = 64 , last_element = False ):  
         
         if last_element is False:
-           #random_numbers = torch.randint(0, torch.cat(list(self.states), dim = 0).shape[0] , (sample_size,))   
+              
            random_numbers = [random.randint(0, len(self.states) - 1) for _ in range(sample_size)]
         else:
             last_index = self.memory_size() - 1
             
             random_numbers = [last_index]
-            
-            #random_numbers = torch.tensor( [ last_index ] ) 
             
         
         return (
@@ -69,16 +75,6 @@ class Agent_Memory:
                 )
         
 
-        '''
-        return (
-                torch.cat(list(self.states), dim = 0)[random_numbers] , 
-                torch.cat(list(self.actions), dim = 0)[random_numbers], 
-                torch.cat(list(self.discrete_actions), dim = 0)[random_numbers], 
-                torch.cat(list(self.rewards), dim = 0)[random_numbers], 
-                torch.cat(list(self.next_states), dim = 0)[random_numbers],    
-                torch.cat(list(self.done), dim = 0)[random_numbers]
-               )
-        '''
        
     def memory_size(self):
          return len(self.states)

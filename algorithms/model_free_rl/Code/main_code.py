@@ -17,10 +17,9 @@ import time
 
 import json
 
-#from simulation_environments import bestest_hydronic_heat_pump
+
 from simulation_environments_2 import bestest_hydronic_heat_pump
 
-#from save_results import save_models, save_train_results, save_test_results
 
 from save_results_2 import save_models, save_train_results, save_test_results
 
@@ -57,7 +56,7 @@ if __name__ == '__main__':
      
     data_config_path = os.path.join(project_root, "configuration_files","data", "task_1","stage_1_action_heat.json") 
     
-    model_config_path = os.path.join(project_root, "configuration_files","models", "task_1", "model_free_sac", "2.json") 
+    model_config_path = os.path.join(project_root, "configuration_files","models", "task_1", "model_free_sac", "0.json") 
     
     data_params, model_params = get_configurations(data_config_path, model_config_path)
 
@@ -65,6 +64,7 @@ if __name__ == '__main__':
     
     set_seed(model_params["rl_agent"]["seed"])
     
+    exp_name = agent_attributes["exp_name"]
     
     n_training_episodes = agent_attributes['n_training_episodes'] 
 
@@ -84,11 +84,11 @@ if __name__ == '__main__':
     print("Device ", device)
     
     """Initialize and load the RL model and memory """
-    #was actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory = initialize_agent(env_attributes)
-    
+
     actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory = initialize_agent(real_env_attributes, agent_attributes)
     
-    actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, last_loaded_episode = load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, agent_attributes)
+    if agent_attributes["resume_from_episode"] >0:   
+        actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, last_loaded_episode = load_models(actor, actor_optimizer, critic_1, critic_optimizer_1, critic_2, critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory, agent_attributes)
 
     last_loaded_episode = 0
        
@@ -139,7 +139,7 @@ if __name__ == '__main__':
                 
                 next_state, reward, done = collect_from_actual_env( env, discrete_action )  
                 
-                agent_actual_memory.remember( state, action, discrete_action, reward, next_state, done)
+                agent_actual_memory.remember( state, action, discrete_action, reward, next_state, done, exp_name)
                 
                 time_step +=1
                 

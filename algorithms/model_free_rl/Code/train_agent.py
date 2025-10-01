@@ -41,42 +41,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 mse_loss = nn.MSELoss()
 
-'''
-def initialize_agent(env_attributes):     
-     
-     
-     actor = Actor(int(env_attributes["state_space"]),  int(env_attributes["agent_h_size"]),  int(env_attributes["action_bins"]), device, int(env_attributes["no_of_action_types"] ) ).to(device) #was  int(env_attributes["action_space"])
-    
-     actor_optimizer = optim.Adam( actor.parameters(), lr= float(env_attributes["actor_lr"]) )
-     
-     
-     critic_1 = Critic(int(env_attributes["state_space"]),  int(env_attributes["agent_h_size"]), device, int(env_attributes["no_of_action_types"] )).to(device) #was  
-     
-     critic_optimizer_1 = optim.Adam( critic_1.parameters(), lr =  float(env_attributes["critic_lr"]) )
-     
-     
-     critic_2 = Critic(int(env_attributes["state_space"]), int(env_attributes["agent_h_size"]), device, int(env_attributes["no_of_action_types"] )).to(device) #was  int(env_attributes["action_space"])
-     
-     critic_optimizer_2 = optim.Adam( critic_2.parameters(), lr =  float(env_attributes["critic_lr"]) )
-     
-     #the entire architecture and weights of model is copied and anychanges to critic_1 weights would not affect critic_target_1
-     critic_target_1 = copy.deepcopy(critic_1)
-     
-     #this is to ensure that we are not by chance updating the weights of target network
-     for param in critic_target_1.parameters():
-         param.requires_grad = False
-         
-     critic_target_2 = copy.deepcopy(critic_2)
-     
-     for param in critic_target_2.parameters():
-        param.requires_grad = False
-     
-     agent_actual_memory = Agent_Memory(env_attributes["buffer_size"])
-     
-     
-     return actor, actor_optimizer, critic_1 , critic_optimizer_1, critic_2 , critic_optimizer_2, critic_target_1, critic_target_2, agent_actual_memory
-
-'''    
+ 
 
 def initialize_agent(real_env_attributes, agent_attributes):     
      

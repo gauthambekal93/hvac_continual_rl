@@ -1,5 +1,5 @@
 {  
-  
+  "exp_name":"task_1_stage_1",
   "rl_agent":  
    
   { 
@@ -20,10 +20,12 @@
      "no_of_updates": 2,
      "metrics_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/metrics.csv",
      "exp_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0",
-     "model_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/Models/rl_models/",
+     "save_model_path": "C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/Models/rl_models/",
      "individual_train_results":"C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/individual_train_results/",
      "individual_test_results":"C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/individual_test_results/",
      "consolidated_results":"C:/Users/gauthambekal93/Research/hvac_continual_rl/results/boptest_hydronic_heat_pump/task_1/model_free_sac/0/consolidated_results/",
+     "load_model_path": "not applicable",   
+     "resume_from_episode": 0,   
      "save_to_file": "True",
      "plot": "True"
 
