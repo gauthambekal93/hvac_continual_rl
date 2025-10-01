@@ -54,9 +54,9 @@ if __name__ == '__main__':
     
     project_root = os.path.abspath( os.path.join(os.getcwd(), "..","..", ".."))
      
-    data_config_path = os.path.join(project_root, "configuration_files","data", "task_1","stage_1_action_heat.json") 
+    data_config_path = os.path.join(project_root, "configuration_files","data", "task_1_stage_1","action_heat.json") 
     
-    model_config_path = os.path.join(project_root, "configuration_files","models", "task_1", "model_free_sac", "0.json") 
+    model_config_path = os.path.join(project_root, "configuration_files","models", "task_1_stage_1", "model_free_sac", "0.json") 
     
     data_params, model_params = get_configurations(data_config_path, model_config_path)
 
