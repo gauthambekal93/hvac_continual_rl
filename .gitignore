@@ -35,6 +35,12 @@ results/boptest_hydronic_heat_pump/task_1_stage_1/model_based_sac/2/Models/env_m
 
 
 #Below is git ignore for task 2 stage 2
+results/boptest_hydronic_heat_pump/task_2_stage_2/model_free_sac/0/individual_train_results/Train_*
+results/boptest_hydronic_heat_pump/task_2_stage_2/model_free_sac/0/individual_test_results/Test_*
+results/boptest_hydronic_heat_pump/task_2_stage_2/model_free_sac/0/Models/rl_models/*.pkl
+
+
+
 results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/individual_train_results/Train_*
 results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/individual_test_results/Test_*
 results/boptest_hydronic_heat_pump/task_2_stage_2/model_based_sac/0/Models/rl_models/*.pkl
